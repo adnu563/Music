@@ -1,5 +1,5 @@
 <h2 align="center">
-    ──「 ᴀɴᴏɴ ダ ᴍᴜsɪᴄ 」──
+    ──「 ᴀᴅɴᴀɴ ダ ᴍᴜsɪᴄ 」──
 </h2>
 
 <p align="center">
@@ -40,7 +40,7 @@
 - Install Node js by :
 `curl -fssL https://deb.nodesource.com/setup_19.x | sudo -E bash - && sudo apt-get install nodejs -y && npm i -g npm`
 - Clone the repository by :
-`git clone https://github.com/Adnan69x/AdnanXMusic && cd AnonXMusic`
+`git clone https://github.com/Adnan69x/AdnanXMusic && cd AdnanXMusic`
 - Install requirements by :
 `pip3 install -U -r requirements.txt`
 - Fill your variables in the env by :
