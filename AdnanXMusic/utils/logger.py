@@ -1,9 +1,11 @@
+from pyrogram import Client
+from pyrogram.types import Message
 from pyrogram.enums import ParseMode
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import is_on_off
 from config import LOGGER_ID
 
-async def play_logs(message, streamtype):
+async def play_logs(message: Message, streamtype: str):
     if await is_on_off(2):
         logger_text = f"""
 <b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
@@ -29,3 +31,8 @@ async def play_logs(message, streamtype):
                 )
             except Exception as e:
                 print(f"Error sending message: {e}")
+
+# Assuming you have already defined app and LOGGER_ID elsewhere in your code
+
+# Example usage:
+# await play_logs(message, "audio")  # Call this function wherever you want to log play events
