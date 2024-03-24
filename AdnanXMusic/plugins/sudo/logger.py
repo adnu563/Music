@@ -1,31 +1,23 @@
-from pyrogram.enums import ParseMode
+from pyrogram import filters
+
 from AdnanXMusic import app
-from AdnanXMusic.utils.database import is_on_off
-from config import LOGGER_ID
+from AdnanXMusic.misc import SUDOERS
+from AdnanXMusic.utils.database import add_off, add_on
+from AdnanXMusic.utils.decorators.language import language
 
-async def play_logs(message, streamtype):
-    if await is_on_off(2):
-        logger_text = f"""
-<b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
-<b>ᴄʜᴀᴛ ɪᴅ :</b> <code>{message.chat.id}</code>
-<b>ᴄʜᴀᴛ ɴᴀᴍᴇ :</b> {message.chat.title}
-<b>ᴄʜᴀᴛ ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.chat.username}
-
-<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>
-<b>ɴᴀᴍᴇ :</b> {message.from_user.mention}
-<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}
-
-<b>ǫᴜᴇʀʏ :</b> {message.text.split(None, 1)[1]}
-<b>sᴛʀᴇᴀᴍᴛʏᴘᴇ :</b> {streamtype}
-"""
-        if message.chat.id != LOGGER_ID:
-            try:
-                await app.send_message(
-                    chat_id=LOGGER_ID,
-                    text=logger_text,
-                    parse_mode=ParseMode.HTML,
-                    disable_web_page_preview=True,
-                )
-            except Exception as e:
-                print(f"Error sending message: {e}")
+@app.on_message(filters.command(["logger"]) & SUDOERS)
+@language
+async def logger(client, message, _):
+    usage = _["log_1"]
+    if len(message.command) != 2:
+        return await message.reply_text(usage)
+    state = message.text.split(None, 1)[1].strip().lower()
+    if state == "enable":
+        await add_on(2)
+        await message.reply_text(_["log_2"])
+    elif state == "disable":
+        await add_off(2)
+        await message.reply_text(_["log_3"])
+    else:
+        await message.reply_text(usage)
