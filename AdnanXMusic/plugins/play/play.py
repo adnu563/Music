@@ -501,7 +501,7 @@ async def play_music(client, CallbackQuery, _):
     return await mystic.delete()
 
 
-@app.on_callback_query(filters.regex("AdnanyAdmin") & ~BANNED_USERS)
+@app.on_callback_query(filters.regex("AdnanAdmin") & ~BANNED_USERS)
 async def Adnan_check(client, CallbackQuery):
     try:
         await CallbackQuery.answer(
