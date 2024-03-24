@@ -3,7 +3,7 @@ from AdnanXMusic import app
 from AdnanXMusic.utils.database import is_on_off
 from config import LOGGER_ID
 
-await play_logs(message, streamtype=streamtype, query=query)
+async def play_logs(message, streamtype, query):
     if await is_on_off(2):
         logger_text = f"""
 <b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
@@ -16,7 +16,7 @@ await play_logs(message, streamtype=streamtype, query=query)
 <b>ɴᴀᴍᴇ :</b> {message.from_user.mention}
 <b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}
 
-<b>ǫᴜᴇʀʏ :</b> {query}
+await play_logs(message, streamtype=streamtype, query=query)
 <b>sᴛʀᴇᴀᴍᴛʏᴘᴇ :</b> {streamtype}
 """
         if message.chat.id != LOGGER_ID:
