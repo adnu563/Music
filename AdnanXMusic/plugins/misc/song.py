@@ -10,7 +10,7 @@ from youtube_search import YoutubeSearch
 from AdnanXMusic.logging import LOGGER
 
 
-@AdnanXMusic.on_message(filters.command(["song", "vsong", "video", "music"]))
+@app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
         await message.delete()
