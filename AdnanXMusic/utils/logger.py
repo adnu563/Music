@@ -5,6 +5,12 @@ from config import LOGGER_ID
 
 async def play_logs(message, streamtype):
     if await is_on_off(2):
+        try:
+            query = message.text.split(None, 1)[1]
+        except IndexError:
+            print("Invalid message format for play log")
+            return
+
         logger_text = f"""
 <b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
@@ -16,7 +22,7 @@ async def play_logs(message, streamtype):
 <b>ɴᴀᴍᴇ :</b> {message.from_user.mention}
 <b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}
 
-<b>ǫᴜᴇʀʏ :</b> {message.text.split(None, 1)[1]}
+<b>ǫᴜᴇʀʏ :</b> {query}
 <b>sᴛʀᴇᴀᴍᴛʏᴘᴇ :</b> {streamtype}
 """
         if message.chat.id != LOGGER_ID:
