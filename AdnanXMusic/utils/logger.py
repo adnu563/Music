@@ -29,10 +29,9 @@ async def play_logs(message: Message, streamtype: str):
                     parse_mode=ParseMode.HTML,
                     disable_web_page_preview=True,
                 )
+                print("Message forwarded successfully")
             except Exception as e:
                 print(f"Error sending message: {e}")
-
-# Assuming you have already defined app and LOGGER_ID elsewhere in your code
 
 # Example usage:
 # await play_logs(message, "audio")  # Call this function wherever you want to log play events
