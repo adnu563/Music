@@ -1,5 +1,5 @@
 from AdnanXMusic import Update, Bot
-from AdnanXMusic import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from AdnanXMusic.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 # Bot token
 TOKEN = "YOUR_BOT_TOKEN"
