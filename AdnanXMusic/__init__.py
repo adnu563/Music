@@ -4,7 +4,7 @@ from AdnanXMusic.core.git import git
 from AdnanXMusic.core.userbot import Userbot
 from AdnanXMusic.misc import dbb, heroku
 
-from .logging import LOGGER
+from AdnanXMusic.logging import LOGGER
 
 dirr()
 git()
