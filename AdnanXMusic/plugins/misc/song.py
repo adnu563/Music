@@ -7,10 +7,10 @@ from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 
-from AdnanXMusic.logging import BOT_MENTION = "AdnanXMusic" LOGGER
+from AdnanXMusic.logging import LOGGER
 
 
-@app.on_message(filters.command(["song", "vsong", "video", "music"]))
+@AdnanXMusic.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
         await message.delete()
