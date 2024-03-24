@@ -1,9 +1,10 @@
 from pyrogram.enums import ParseMode
+
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import is_on_off
 from config import LOGGER_ID
 
-async def play_logs(message, streamtype, query):
+async def play_logs(message, streamtype):
     if await is_on_off(2):
         logger_text = f"""
 <b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
@@ -16,9 +17,8 @@ async def play_logs(message, streamtype, query):
 <b>ɴᴀᴍᴇ :</b> {message.from_user.mention}
 <b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}
 
-await play_logs(message, streamtype=streamtype, query=query)
-<b>sᴛʀᴇᴀᴍᴛʏᴘᴇ :</b> {streamtype}
-"""
+<b>ǫᴜᴇʀʏ :</b> {message.text.split(None, 1)[1]}
+<b>sᴛʀᴇᴀᴍᴛʏᴘᴇ :</b> {streamtype}"""
         if message.chat.id != LOGGER_ID:
             try:
                 await app.send_message(
