@@ -1,19 +1,31 @@
-import logging
+from pyrogram.enums import ParseMode
+from AnonXMusic import app
+from AnonXMusic.utils.database import is_on_off
+from config import LOGGER_ID
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s - %(levelname)s] - %(name)s - %(message)s",
-    datefmt="%d-%b-%y %H:%M:%S",
-    handlers=[
-        logging.FileHandler("log.txt"),
-        logging.StreamHandler(),
-    ],
-)
+async def play_logs(message, streamtype):
+    if await is_on_off(2):
+        logger_text = f"""
+<b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
-logging.getLogger("httpx").setLevel(logging.ERROR)
-logging.getLogger("pyrogram").setLevel(logging.ERROR)
-logging.getLogger("pytgcalls").setLevel(logging.ERROR)
+<b>ᴄʜᴀᴛ ɪᴅ :</b> <code>{message.chat.id}</code>
+<b>ᴄʜᴀᴛ ɴᴀᴍᴇ :</b> {message.chat.title}
+<b>ᴄʜᴀᴛ ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.chat.username}
 
+<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>
+<b>ɴᴀᴍᴇ :</b> {message.from_user.mention}
+<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}
 
-def LOGGER(name: str) -> logging.Logger:
-    return logging.getLogger(name)
+<b>ǫᴜᴇʀʏ :</b> {message.text.split(None, 1)[1]}
+<b>sᴛʀᴇᴀᴍᴛʏᴘᴇ :</b> {streamtype}
+"""
+        if message.chat.id != LOGGER_ID:
+            try:
+                await app.send_message(
+                    chat_id=LOGGER_ID,
+                    text=logger_text,
+                    parse_mode=ParseMode.HTML,
+                    disable_web_page_preview=True,
+                )
+            except Exception as e:
+                print(f"Error sending message: {e}")
