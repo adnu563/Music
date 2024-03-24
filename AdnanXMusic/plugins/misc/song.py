@@ -1,212 +1,465 @@
 import os
-import re
 
 import yt_dlp
-from pykeyboard import InlineKeyboard
-from pyrogram import filters
-from pyrogram.types import (InlineKeyboardButton,
-                            InlineKeyboardMarkup, InputMediaAudio,
-                            InputMediaVideo, Message)
+from Music import BOT_NAME, BOT_USERNAME, app
+from Music.config import DURATION_LIMIT
+from Music.MusicUtilities.database.chats import is_served_chat
+from Music.MusicUtilities.helpers.filters import command
+from Music.MusicUtilities.helpers.gets import get_url
+from Music.MusicUtilities.helpers.inline import search_markup
+from Music.MusicUtilities.helpers.thumbnails import down_thumb
+from Music.MusicUtilities.helpers.ytdl import ytdl_opts
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from youtubesearchpython import VideosSearch
 
-from AdnanXMusic import (BANNED_USERS, SONG_DOWNLOAD_DURATION,
-                    SONG_DOWNLOAD_DURATION_LIMIT)
-from strings import get_command
-from AdnanXMusic import YouTube, app
-from AdnanXMusic.utils.decorators.language import language, languageCB
-from AdnanXMusic.utils.formatters import convert_bytes
-from AdnanXMusic.utils.inline.song import song_markup
-
-# Command
-SONG_COMMAND = get_command("SONG_COMMAND")
+flex = {}
+chat_watcher_group = 3
 
 
-@app.on_message(
-    filters.command(SONG_COMMAND)
-    & filters.group
-    & ~filters.edited
-    & ~BANNED_USERS
+def time_to_seconds(time):
+    stringt = str(time)
+    return sum(int(x) * 60 ** i for i, x in enumerate(reversed(stringt.split(":"))))
+
+
+@Client.on_message(
+    command(["song", f"song@{BOT_USERNAME}", "vsong", f"vsong@{BOT_USERNAME}"])
 )
-@language
-async def song_commad_group(client, message: Message, _):
-    upl = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    text=_["SG_B_1"],
-                    url=f"https://t.me/{app.username}?start=song",
-                ),
-            ]
-        ]
-    )
-    await message.reply_text(_["song_1"], reply_markup=upl)
+async def mpthree(_, message: Message):
+    chat_id = message.chat.id
+    if message.sender_chat:
+        return await message.reply_text(
+            """
+You are an Anonymous Admin! Revert to User Account From Admin Rights.
+"""
+        )
+    user_id = message.from_user.id
+    message.chat.title
+    message.from_user.first_name
+    checking = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
 
-
-# Song Module
-
-
-@app.on_message(
-    filters.command(SONG_COMMAND)
-    & filters.private
-    & ~filters.edited
-    & ~BANNED_USERS
-)
-@language
-async def song_commad_private(client, message: Message, _):
-    await message.delete()
-    url = await YouTube.url(message)
+    url = get_url(message)
     if url:
-        if not await YouTube.exists(url):
-            return await message.reply_text(_["song_5"])
-        mystic = await message.reply_text(_["play_1"])
-        (
-            title,
-            duration_min,
-            duration_sec,
-            thumbnail,
-            vidid,
-        ) = await YouTube.details(url)
-        if str(duration_min) == "None":
-            return await mystic.edit_text(_["song_3"])
-        if int(duration_sec) > SONG_DOWNLOAD_DURATION_LIMIT:
+        query = message.text.split(None, 1)[1]
+        mystic = await message.reply_text("Sedang memproses")
+        ydl_opts = {"format": "bestaudio/best"}
+        try:
+            results = VideosSearch(query, limit=1)
+            for result in results.result()["result"]:
+                title = result["title"]
+                duration = result["duration"]
+                views = result["viewCount"]["short"]
+                thumbnail = result["thumbnails"][0]["url"]
+                (result["link"])
+                (result["id"])
+                videoid = result["id"]
+        except Exception as e:
+            return await mystic.edit_text(f"Soung Not Found.\n**Possible Reason:**{e}")
+        smex = int(time_to_seconds(duration))
+        if smex > DURATION_LIMIT:
             return await mystic.edit_text(
-                _["play_4"].format(
-                    SONG_DOWNLOAD_DURATION, duration_min
-                )
+                f"**__Duration Error__**\n\n**Allowed Duration: **90 minute(s)\n**Received Duration:** {duration} minute(s)"
             )
-        buttons = song_markup(_, vidid)
-        await mystic.delete()
-        return await message.reply_photo(
-            thumbnail,
-            caption=_["song_4"].format(title),
+        if duration == "None":
+            return await mystic.edit_text("Sorry! Live videos are not Supported")
+        if views == "None":
+            return await mystic.edit_text("Sorry! Live videos are not Supported")
+        thumb = await down_thumb(thumbnail, user_id)
+        buttons = gets(videoid, user_id)
+        m = await message.reply_text(
+            f"""
+<b>🏷️ song:</b> [{title[:25]}]({url})
+<b>💡</b> [More Information](https://t.me/{BOT_USERNAME}?start=info_{id})
+<b>⚡ Uploaded by</b> [{BOT_NAME}](t.me/{BOT_USERNAME})
+""",
             reply_markup=InlineKeyboardMarkup(buttons),
         )
+        os.remove(thumb)
     else:
         if len(message.command) < 2:
-            return await message.reply_text(_["song_2"])
-    mystic = await message.reply_text(_["play_1"])
-    query = message.text.split(None, 1)[1]
-    try:
-        (
-            title,
-            duration_min,
-            duration_sec,
-            thumbnail,
-            vidid,
-        ) = await YouTube.details(query)
-    except:
-        return await mystic.edit_text(_["play_3"])
-    if str(duration_min) == "None":
-        return await mystic.edit_text(_["song_3"])
-    if int(duration_sec) > SONG_DOWNLOAD_DURATION_LIMIT:
-        return await mystic.edit_text(
-            _["play_6"].format(SONG_DOWNLOAD_DURATION, duration_min)
+            await message.reply_text(
+                """
+**Usage:**
+
+/song or /vsong [Song Title Or Youtube Link] - to download songs and videos
+"""
+            )
+        query = message.text.split(None, 1)[1]
+        mystic = await message.reply_text("**🔎 Searching**")
+        try:
+            a = VideosSearch(query, limit=5)
+            result = (a.result()).get("result")
+            title1 = result[0]["title"]
+            duration1 = result[0]["duration"]
+            title2 = result[1]["title"]
+            duration2 = result[1]["duration"]
+            title3 = result[2]["title"]
+            duration3 = result[2]["duration"]
+            title4 = result[3]["title"]
+            duration4 = result[3]["duration"]
+            title5 = result[4]["title"]
+            duration5 = result[4]["duration"]
+            ID1 = result[0]["id"]
+            ID2 = result[1]["id"]
+            ID3 = result[2]["id"]
+            ID4 = result[3]["id"]
+            ID5 = result[4]["id"]
+        except Exception as e:
+            return await mystic.edit_text(
+                f"Song Not Found.\n**Possible Reason:** {e}"
+            )
+        await mystic.delete()
+        buttons = search_markup(
+            ID1,
+            ID2,
+            ID3,
+            ID4,
+            ID5,
+            duration1,
+            duration2,
+            duration3,
+            duration4,
+            duration5,
+            user_id,
+            query,
         )
-    buttons = song_markup(_, vidid)
-    await mystic.delete()
-    return await message.reply_photo(
-        thumbnail,
-        caption=_["song_4"].format(title),
+        hmo = await message.reply_text(
+            f"""
+<b>✨ Please Select the Song You Want to Download</b>
+
+
+¹ <b>{title1[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID1})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+² <b>{title2[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID2})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+³ <b>{title3[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID3})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+⁴ <b>{title4[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID4})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+⁵ <b>{title5[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID5})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+""",
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+        return
+
+
+@Client.on_callback_query(filters.regex(pattern=r"beta"))
+async def startyuplay(_, CallbackQuery):
+    callback_data = CallbackQuery.data.strip()
+    CallbackQuery.message.chat.id
+    CallbackQuery.message.chat.title
+    callback_request = callback_data.split(None, 1)[1]
+    userid = CallbackQuery.from_user.id
+    try:
+        id, duration, user_id = callback_request.split("|")
+    except Exception as e:
+        return await CallbackQuery.message.edit(
+            f"Error Occured\n**Possible reason could be**:{e}"
+        )
+    if duration == "None":
+        return await CallbackQuery.message.reply_text(
+            f"Sorry!, Live Videos are not supported"
+        )
+    if CallbackQuery.from_user.id != int(user_id):
+        return await CallbackQuery.answer(
+            "This is not for you! Search You Own Song nigga", show_alert=True
+        )
+    await CallbackQuery.message.delete()
+    checking = f"[{CallbackQuery.from_user.first_name}](tg://user?id={userid})"
+    url = f"https://www.youtube.com/watch?v={id}"
+    videoid = id
+    smex = int(time_to_seconds(duration))
+    if smex > DURATION_LIMIT:
+        await CallbackQuery.message.reply_text(
+            f"**__Duration Error__**\n\n**Allowed Duration: **90 minute(s)\n**Received Duration:** {duration} minute(s)"
+        )
+        return
+    try:
+        with yt_dlp.YoutubeDL(ytdl_opts) as ytdl:
+            x = ytdl.extract_info(url, download=False)
+    except Exception as e:
+        return await CallbackQuery.message.reply_text(
+            f"Failed to download this video.\n\n**Reason**:{e}"
+        )
+    title = x["title"]
+    await CallbackQuery.answer(
+        f"Selected {title[:20]}.... \nProcessing..", show_alert=True
+    )
+    thumbnail = x["thumbnail"]
+    (x["id"])
+    videoid = x["id"]
+    thumb = await down_thumb(thumbnail, user_id)
+    buttons = gets(videoid, user_id)
+    m = await CallbackQuery.message.reply_photo(
+        photo=thumb,
         reply_markup=InlineKeyboardMarkup(buttons),
+        caption=f"""
+<b>🏷️ Name:</b> [{title[:25]}]({url})
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{id})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+""",
     )
+    os.remove(thumb)
+    await CallbackQuery.message.delete()
 
 
-@app.on_callback_query(
-    filters.regex(pattern=r"song_back") & ~BANNED_USERS
-)
-@languageCB
-async def songs_back_helper(client, CallbackQuery, _):
+@Client.on_callback_query(filters.regex(pattern=r"chonga"))
+async def chonga(_, CallbackQuery):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
-    stype, vidid = callback_request.split("|")
-    buttons = song_markup(_, vidid)
-    return await CallbackQuery.edit_message_reply_markup(
-        reply_markup=InlineKeyboardMarkup(buttons)
-    )
-
-
-# Downloading Songs Here
-
-
-@app.on_callback_query(
-    filters.regex(pattern=r"song_download") & ~BANNED_USERS
-)
-@languageCB
-async def song_download_cb(client, CallbackQuery, _):
+    print(callback_request)
+    CallbackQuery.from_user.id
     try:
-        await CallbackQuery.answer("Downloading")
-    except:
-        pass
-    callback_data = CallbackQuery.data.strip()
-    callback_request = callback_data.split(None, 1)[1]
-    stype, format_id, vidid = callback_request.split("|")
-    mystic = await CallbackQuery.edit_message_text(_["song_8"])
-    yturl = f"https://www.youtube.com/watch?v={vidid}"
-    with yt_dlp.YoutubeDL({"quiet": True}) as ytdl:
-        x = ytdl.extract_info(yturl, download=False)
-    title = (x["title"]).title()
-    title = re.sub("\W+", " ", title)
-    thumb_image_path = await CallbackQuery.message.download()
-    duration = x["duration"]
-    if stype == "video":
-        thumb_image_path = await CallbackQuery.message.download()
-        width = CallbackQuery.message.photo.width
-        height = CallbackQuery.message.photo.height
-        try:
-            file_path = await YouTube.download(
-                yturl,
-                mystic,
-                songvideo=True,
-                format_id=format_id,
-                title=title,
-            )
-        except Exception as e:
-            return await mystic.edit_text(_["song_9"].format(e))
-        med = InputMediaVideo(
-            media=file_path,
-            duration=duration,
-            width=width,
-            height=height,
-            thumb=thumb_image_path,
-            caption=title,
-            supports_streaming=True,
+        id, query, user_id = callback_request.split("|")
+    except Exception as e:
+        return await CallbackQuery.message.edit(
+            f"Error Occured\n**Possible reason could be**:{e}"
         )
-        await mystic.edit_text(_["song_11"])
-        await app.send_chat_action(
-            chat_id=CallbackQuery.message.chat.id,
-            action="upload_video",
+    if CallbackQuery.from_user.id != int(user_id):
+        return await CallbackQuery.answer(
+            "This is not for you! Search You Own Song", show_alert=True
         )
-        try:
-            await CallbackQuery.edit_message_media(media=med)
-        except Exception as e:
-            print(e)
-            return await mystic.edit_text(_["song_10"])
-        os.remove(file_path)
-    elif stype == "audio":
-        try:
-            filename = await YouTube.download(
-                yturl,
-                mystic,
-                songaudio=True,
-                format_id=format_id,
-                title=title,
-            )
-        except Exception as e:
-            return await mystic.edit_text(_["song_9"].format(e))
-        med = InputMediaAudio(
-            media=filename,
-            caption=title,
-            thumb=thumb_image_path,
-            title=title,
-            performer=x["uploader"],
+    i = int(id)
+    query = str(query)
+    try:
+        a = VideosSearch(query, limit=10)
+        result = (a.result()).get("result")
+        title1 = result[0]["title"]
+        duration1 = result[0]["duration"]
+        title2 = result[1]["title"]
+        duration2 = result[1]["duration"]
+        title3 = result[2]["title"]
+        duration3 = result[2]["duration"]
+        title4 = result[3]["title"]
+        duration4 = result[3]["duration"]
+        title5 = result[4]["title"]
+        duration5 = result[4]["duration"]
+        title6 = result[5]["title"]
+        duration6 = result[5]["duration"]
+        title7 = result[6]["title"]
+        duration7 = result[6]["duration"]
+        title8 = result[7]["title"]
+        duration8 = result[7]["duration"]
+        title9 = result[8]["title"]
+        duration9 = result[8]["duration"]
+        title10 = result[9]["title"]
+        duration10 = result[9]["duration"]
+        ID1 = result[0]["id"]
+        ID2 = result[1]["id"]
+        ID3 = result[2]["id"]
+        ID4 = result[3]["id"]
+        ID5 = result[4]["id"]
+        ID6 = result[5]["id"]
+        ID7 = result[6]["id"]
+        ID8 = result[7]["id"]
+        ID9 = result[8]["id"]
+        ID10 = result[9]["id"]
+    except Exception as e:
+        return await mystic.edit_text(
+            f"Song Not Found.\\in**Possible Reason:** {e}"
         )
-        await mystic.edit_text(_["song_11"])
-        await app.send_chat_action(
-            chat_id=CallbackQuery.message.chat.id,
-            action="upload_audio",
+    if i == 1:
+        buttons = search_markup2(
+            ID6,
+            ID7,
+            ID8,
+            ID9,
+            ID10,
+            duration6,
+            duration7,
+            duration8,
+            duration9,
+            duration10,
+            user_id,
+            query,
         )
-        try:
-            await CallbackQuery.edit_message_media(media=med)
-        except Exception as e:
-            print(e)
-            return await mystic.edit_text(_["song_10"])
-        os.remove(filename)
+        await CallbackQuery.edit_message_text(
+            f"""
+<b>✨ Please Select the Song You Want to Download</b>
+
+
+⁶ <b>{title6[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID6})
+└ ⚡ **:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+⁷ <b>{title7[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID7})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+⁸ <b>{title8[:20]}</b>
+├ 💡 [Get Additional Information](https://t.me/{BOT_USERNAME}?start=info_{ID8})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+⁹ <b>{title9[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID9})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+¹⁰ <b>{title10[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID10})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+""",
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+        return
+    if i == 2:
+        buttons = search_markup(
+            ID1,
+            ID2,
+            ID3,
+            ID4,
+            ID5,
+            duration1,
+            duration2,
+            duration3,
+            duration4,
+            duration5,
+            user_id,
+            query,
+        )
+        await CallbackQuery.edit_message_text(
+            f"""
+<b>✨ Please Select the Song You Want to Download</b>
+
+
+¹ <b>{title1[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID1})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+² <b>{title2[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID2})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+³ <b>{title3[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID3})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+⁴ <b>{title4[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID4})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+
+⁵ <b>{title5[:20]}</b>
+├ 💡 [More Information](https://t.me/{BOT_USERNAME}?start=info_{ID5})
+└ ⚡ **Supported:** [{BOT_NAME}](t.me/{BOT_USERNAME})
+""",
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+        return
+
+
+def search_markup(
+    ID1,
+    ID2,
+    ID3,
+    ID4,
+    ID5,
+    duration1,
+    duration2,
+    duration3,
+    duration4,
+    duration5,
+    user_id,
+    query,
+):
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text="1", callback_data=f"beta {ID1}|{duration1}|{user_id}"
+            ),
+            InlineKeyboardButton(
+                text="2", callback_data=f"beta {ID2}|{duration2}|{user_id}"
+            ),
+            InlineKeyboardButton(
+                text="3", callback_data=f"beta {ID3}|{duration3}|{user_id}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="4", callback_data=f"beta {ID4}|{duration4}|{user_id}"
+            ),
+            InlineKeyboardButton(
+                text="5", callback_data=f"beta {ID5}|{duration5}|{user_id}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="⬅️", callback_data=f"chonga 1|{query}|{user_id}"
+            ),
+            InlineKeyboardButton(text="🗑️", callback_data=f"ppcl2 smex|{user_id}"),
+            InlineKeyboardButton(
+                text="➡️", callback_data=f"chonga 1|{query}|{user_id}"
+            ),
+        ],
+    ]
+    return buttons
+
+
+def search_markup2(
+    ID6,
+    ID7,
+    ID8,
+    ID9,
+    ID10,
+    duration6,
+    duration7,
+    duration8,
+    duration9,
+    duration10,
+    user_id,
+    query,
+):
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text="6", callback_data=f"beta {ID6}|{duration6}|{user_id}"
+            ),
+            InlineKeyboardButton(
+                text="7", callback_data=f"beta {ID7}|{duration7}|{user_id}"
+            ),
+            InlineKeyboardButton(
+                text="8", callback_data=f"beta {ID8}|{duration8}|{user_id}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="9", callback_data=f"beta {ID9}|{duration9}|{user_id}"
+            ),
+            InlineKeyboardButton(
+                text="10", callback_data=f"beta {ID10}|{duration10}|{user_id}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="⬅️", callback_data=f"chonga 2|{query}|{user_id}"
+            ),
+            InlineKeyboardButton(text="🗑️", callback_data=f"ppcl2 smex|{user_id}"),
+            InlineKeyboardButton(
+                text="➡️", callback_data=f"chonga 2|{query}|{user_id}"
+            ),
+        ],
+    ]
+    return buttons
+
+
+def gets(videoid, user_id):
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text="ᴀᴜᴅɪᴏ", callback_data=f"gets audio|{videoid}|{user_id}"
+            ),
+            InlineKeyboardButton(
+                text="ᴠɪᴅᴇᴏ", callback_data=f"gets video|{videoid}|{user_id}"
+            ),
+        ],
+        [InlineKeyboardButton(text="ᴛᴜᴛᴜᴘ", callback_data=f"close2")],
+    ]
+    return buttons
