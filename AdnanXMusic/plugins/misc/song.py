@@ -7,8 +7,8 @@ from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 
-from AdnanXMusic.logging import LOGGER
-BOT_MENTION = "AdnanXMusic"
+from AdnanXMusic.logging import BOT_MENTION = "AdnanXMusic" LOGGER
+
 
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
