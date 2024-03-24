@@ -1,14 +1,14 @@
 import os
 
 import yt_dlp
-from Music import BOT_NAME, BOT_USERNAME, app
-from Music.config import DURATION_LIMIT
-from Music.MusicUtilities.database.chats import is_served_chat
-from Music.MusicUtilities.helpers.filters import command
-from Music.MusicUtilities.helpers.gets import get_url
-from Music.MusicUtilities.helpers.inline import search_markup
-from Music.MusicUtilities.helpers.thumbnails import down_thumb
-from Music.MusicUtilities.helpers.ytdl import ytdl_opts
+from AdnanXMusic import BOT_NAME, BOT_USERNAME, app
+from AdnanXMusic.config import DURATION_LIMIT
+from AdnanXMusic.MusicUtilities.database.chats import is_served_chat
+from AdnanXMusic.MusicUtilities.helpers.filters import command
+from AdnanXMusic.MusicUtilities.helpers.gets import get_url
+from AdnanXMusic.MusicUtilities.helpers.inline import search_markup
+from AdnanXMusic.MusicUtilities.helpers.thumbnails import down_thumb
+from AdnanXMusic.MusicUtilities.helpers.ytdl import ytdl_opts
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython import VideosSearch
