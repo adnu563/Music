@@ -3,14 +3,8 @@ from AdnanXMusic import app
 from AdnanXMusic.utils.database import is_on_off
 from config import LOGGER_ID
 
-async def play_logs(message, streamtype):
+async def play_logs(message, streamtype, query):
     if await is_on_off(2):
-        try:
-            query = message.text.split(None, 1)[1]
-        except IndexError:
-            print("Invalid message format for play log")
-            return
-
         logger_text = f"""
 <b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
