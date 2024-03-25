@@ -1,4 +1,4 @@
-from config import LOGGER_ID,
+from config import LOGGER_ID, LOGGER_ID
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import is_on_off
 
