@@ -1,37 +1,27 @@
-from Telegram import Update, Bot
-from Telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, MessageHandler, Filters
+import logging
 
-# Bot token
-TOKEN = "YOUR_BOT_TOKEN"
+# Set up logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Counter for the number of groups
-bot_count = 0
+# Define a function to handle new members joining the group
+def new_member(update, context):
+    new_members = update.message.new_chat_members
+    for member in new_members:
+        logger.info(f"New member joined: {member.first_name} ({member.id})")
 
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Bot is running. Use /info to get info about the group.')
+def main():
+    # Set up the updater and dispatcher
+    updater = Updater("YOUR_BOT_TOKEN", use_context=True)
+    dp = updater.dispatcher
 
-def info(update: Update, context: CallbackContext) -> None:
-    chat = update.message.chat
-    message = f"» ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ! 🥳\n\n"
-    message += f"ᴄʜᴀᴛ : {chat.title}\n"
-    message += f"ᴄʜᴀᴛ ɪᴅ : {chat.id}\n"
-    message += f"ᴄʜᴀᴛ ᴜɴᴀᴍᴇ : @{chat.username}\n"
-    message += f"ᴛᴏᴛᴀʟ ᴄʜᴀᴛ : {chat.get_members_count()}\n"
-    message += f"ᴀᴅᴅᴇᴅ ʙʏ : {update.message.from_user.first_name}"
-    update.message.reply_text(message)
+    # Add a message handler to handle new members joining the group
+    dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, new_member))
 
-    # Increase bot_count when added to a new group
-    global bot_count
-    bot_count += 1
-
-def main() -> None:
-    updater = Updater(TOKEN)
-    dispatcher = updater.dispatcher
-
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("info", info))
-
+    # Start the bot
     updater.start_polling()
+    logger.info("Bot started polling...")
     updater.idle()
 
 if __name__ == '__main__':
