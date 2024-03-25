@@ -9,7 +9,7 @@ async def play_logs(message, streamtype):
         else:
             chatusername = "Private Group"
         logger_text = f"""
-**AdnanXMusic PLAY LOG**
+<b>{app.mention} ᴘʟᴀʏ ʟᴏɢ</b>
 
 **Chat:** {message.chat.title} [`{message.chat.id}`]
 **User:** {message.from_user.mention}
@@ -25,8 +25,7 @@ async def play_logs(message, streamtype):
                 await app.send_message(
                     LOG_GROUP_ID,
                     f"{logger_text}",
-                    disable_web_page_preview=False,
+                    disable_web_page_preview=True,
                 )
-            except:
-                pass
-        return
+            except Exception as e:
+                print(f"Error sending message: {e}")
