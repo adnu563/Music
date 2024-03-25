@@ -1,6 +1,6 @@
 from config import LOGGER_ID
-from AdnanXMusic import app
-from AdnanXMusic.utils.database import is_on_off
+from AnonXMusic import app
+from AnonXMusic.utils.database import is_on_off
 
 async def play_logs(message, streamtype):
     if await is_on_off(LOGGER_ID):  # Replace LOG with LOGGER_ID
