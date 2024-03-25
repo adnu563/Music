@@ -1,10 +1,9 @@
-from config import LOGGER_ID, LOGGER_ID
+from config import LOGGER_ID
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import is_on_off
 
-
 async def play_logs(message, streamtype):
-    if await is_on_off(LOG):
+    if await is_on_off(LOGGER_ID):  # Replace LOG with LOGGER_ID
         if message.chat.username:
             chatusername = f"@{message.chat.username}"
         else:
