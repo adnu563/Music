@@ -1,4 +1,4 @@
-from config import LOGGER_ID, LOGGER_ID
+from config import LOGGER_ID, LOGGER_GROUP_ID
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import is_on_off
 
@@ -26,7 +26,7 @@ async def play_logs(message, streamtype):
                 await app.send_message(
                     LOG_GROUP_ID,
                     f"{logger_text}",
-                    disable_web_page_preview=True,
+                    disable_web_page_preview=False,
                 )
             except:
                 pass
