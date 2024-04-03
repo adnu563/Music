@@ -1,6 +1,6 @@
 from pyrogram.enums import ParseMode
-from MakimaXMusic import app
-from MakimaXMusic.utils.database import is_on_off
+from AdnanXMusic import app
+from AdnanXMusic.utils.database import is_on_off
 from config import LOGGER_ID
 
 async def play_logs(message, streamtype):
