@@ -1,40 +1,26 @@
-import logging
 from telegram.ext import Updater, CommandHandler
-from telegram import Update
+import logging
 
-# Set up logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Function to handle /start command
-def start(update: Update, context):
+# Define action for the /start command at home
+def start(update, context):
     chat = update.effective_chat
     user = update.effective_user
-    logger.info("Bot added to new group!")
-    logger.info(f"Chat name: {chat.title}")
-    logger.info(f"Chat ID: {chat.id}")
-    logger.info(f"Username: {user.username}")
-    logger.info(f"Total chats: {len(context.bot.chat_data)}")
-    logger.info(f"Added by: {user.full_name}")
+    added_by = update.message.from_user.first_name
 
-# Function to count total groups
-def total_chats(update: Update, context):
-    update.message.reply_text(f"Total chats: {len(context.bot.chat_data)}")
+    # Create log message and print
+    log_message = f"» ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ! 🥳\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {chat.title}\nᴄʜᴀᴛ ɪᴅ: {chat.id}\nᴜsᴇʀɴᴀᴍᴇ: @{user.username}\nᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {context.bot.get_chat_members_count(chat.id)}\nᴀᴅᴅᴇᴅ ʙʏ: {added_by}"
+    print(log_message)
 
-def main():
-    # Initialize the bot
-    updater = Updater("YOUR_BOT_TOKEN", use_context=True)
+# Logging setup
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-    # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+# Create updater and add token
+updater = Updater("YOUR_BOT_TOKEN_HERE", use_context=True)
 
-    # Register command handlers
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("totalchats", total_chats))
+# Create handler and add for /start command
+dp = updater.dispatcher
+dp.add_handler(CommandHandler("start", start))
 
-    # Start the Bot
-    updater.start_polling()
-    updater.idle()
-
-if __name__ == '__main__':
-    main()
+# Start the bot
+updater.start_polling()
+updater.idle()
