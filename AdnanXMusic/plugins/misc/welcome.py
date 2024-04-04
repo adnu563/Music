@@ -1,4 +1,4 @@
-from telegram.ext import Updater, MessageHandler, Filters, ChatMemberHandler
+from telegram.ext import Updater, MessageHandler, Filters, ChatMembersHandler
 import logging
 
 # Enable logging
@@ -25,7 +25,7 @@ updater = Updater("YOUR_TELEGRAM_BOT_TOKEN", use_context=True)
 dispatcher = updater.dispatcher
 
 # Register the handler for new chat additions
-dispatcher.add_handler(ChatMemberHandler(new_chat_added, ChatMemberHandler.CHAT_MEMBER))
+dispatcher.add_handler(ChatMembersHandler(new_chat_added))
 
 # Start the bot
 updater.start_polling()
