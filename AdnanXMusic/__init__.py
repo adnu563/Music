@@ -11,7 +11,7 @@ git()
 dbb()
 heroku()
 
-app = Adnany()
+app = Anony()
 userbot = Userbot()
 
 
@@ -24,6 +24,3 @@ Spotify = SpotifyAPI()
 Resso = RessoAPI()
 Telegram = TeleAPI()
 YouTube = YouTubeAPI()
-
-
-Please fix this error code
