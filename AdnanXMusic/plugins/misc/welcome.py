@@ -14,9 +14,6 @@ def start(update, context):
 # Logging setup
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-# Create updater and add token
-updater = Updater("YOUR_BOT_TOKEN_HERE", use_context=True)
-
 # Create handler and add for /start command
 dp = updater.dispatcher
 dp.add_handler(CommandHandler("start", start))
