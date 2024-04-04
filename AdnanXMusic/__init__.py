@@ -3,7 +3,7 @@ from AdnanXMusic.core.dir import dirr
 from AdnanXMusic.core.git import git
 from AdnanXMusic.core.userbot import Userbot
 from AdnanXMusic.misc import dbb, heroku
-from .platforms import *
+from AdnanXMusic.misc import song.py
 
 from .logging import LOGGER
 
@@ -25,3 +25,6 @@ Spotify = SpotifyAPI()
 Resso = RessoAPI()
 Telegram = TeleAPI()
 YouTube = YouTubeAPI()
+
+
+Please fix this error code
