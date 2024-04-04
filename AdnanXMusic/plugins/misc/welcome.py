@@ -19,7 +19,8 @@ def print_welcome_message(update: Update, context: CallbackContext):
         f"ᴀᴅᴅᴇᴅ ʙʏ: {added_by}\n"
     )
 
-    update.message.reply_text(welcome_message)
+    # Log the welcome message
+    print(welcome_message)
 
 # Define the command handler for when the bot is added to a new group
 def start(update: Update, context: CallbackContext):
