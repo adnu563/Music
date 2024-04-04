@@ -1,32 +1,32 @@
-from telegram.ext import Updater, CommandHandler
-from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import Updater, MessageHandler, Filters, ChatMemberHandler
+import logging
 
-# Your Telegram user ID
-YOUR_TELEGRAM_USER_ID = "your_user_id"
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Define the function to send a notification to your Telegram account
-def send_notification(bot, message):
-    bot.send_message(chat_id=YOUR_TELEGRAM_USER_ID, text=message)
+# Define a function to handle new group addition
+def new_chat_added(update, context):
+    chat = update.effective_chat
+    user = update.effective_user
 
-# Define the function to handle when the bot is added to a new group
-def handle_new_chat(update: Update, context: CallbackContext):
-    chat_id = update.message.chat_id
-    chat_name = update.message.chat.title
-    message = f"Bot added to new group!\nGroup Name: {chat_name}\nGroup ID: {chat_id}"
-    send_notification(context.bot, message)
+    chat_name = chat.title
+    chat_id = chat.id
+    username = user.username
+    total_members = context.bot.get_chat_members_count(chat_id)
+    added_by = user.first_name
 
-# Set up the bot
-def main():
-    # Replace "YOUR_BOT_TOKEN" with your actual bot token
-    updater = Updater("YOUR_BOT_TOKEN", use_context=True)
-    dp = updater.dispatcher
+    # Send the message to the log group
+    log_message = f"» ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ! 🥳\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {chat_name}\nᴄʜᴀᴛ ɪᴅ: {chat_id}\nᴜsᴇʀɴᴀᴍᴇ: {username}\nᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {total_members}\nᴀᴅᴅᴇᴅ ʙʏ: {added_by}"
+    context.bot.send_message(LOG_CHAT_ID, log_message)
 
-    # Register the handler for when the bot is added to a new group
-    dp.add_handler(CommandHandler("new_chat", handle_new_chat))
+# Set up the updater and dispatcher
+updater = Updater("YOUR_TELEGRAM_BOT_TOKEN", use_context=True)
+dispatcher = updater.dispatcher
 
-    updater.start_polling()
-    updater.idle()
+# Register the handler for new chat additions
+dispatcher.add_handler(ChatMemberHandler(new_chat_added, ChatMemberHandler.CHAT_MEMBER))
 
-if __name__ == "__main__":
-    main()
+# Start the bot
+updater.start_polling()
+updater.idle()
