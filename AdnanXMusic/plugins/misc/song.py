@@ -1,7 +1,6 @@
 import os
 
 import yt_dlp
-from Music import BOT_NAME, BOT_USERNAME, app
 from Music.config import DURATION_LIMIT
 from Music.MusicUtilities.database.chats import is_served_chat
 from Music.MusicUtilities.helpers.filters import command
