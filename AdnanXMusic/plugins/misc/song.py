@@ -2,7 +2,7 @@ from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 
 from config import Config
-from Music.core.clients import AdnanXMusic
+from Music.core.clients import AdnanXMusi
 from Music.core.decorators import UserWrapper, check_mode
 from Music.helpers.formatters import formatter
 from Music.utils.pages import MakePages
