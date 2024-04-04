@@ -2,36 +2,28 @@ from telegram.ext import Updater, CommandHandler
 from telegram import Update
 from telegram.ext import CallbackContext
 
-# Define your welcome message function
-def print_welcome_message(update: Update, context: CallbackContext):
-    chat_name = update.message.chat.title
+# Your Telegram user ID
+YOUR_TELEGRAM_USER_ID = "your_user_id"
+
+# Define the function to send a notification to your Telegram account
+def send_notification(bot, message):
+    bot.send_message(chat_id=YOUR_TELEGRAM_USER_ID, text=message)
+
+# Define the function to handle when the bot is added to a new group
+def handle_new_chat(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    username = update.message.from_user.username
-    total_chat = context.bot.get_chat_members_count(chat_id)
-    added_by = update.message.from_user.name
-
-    welcome_message = (
-        "» ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ! 🥳\n\n"
-        f"ᴄʜᴀᴛ ɴᴀᴍᴇ: {chat_name}\n"
-        f"ᴄʜᴀᴛ ɪᴅ: {chat_id}\n"
-        f"ᴜsᴇʀɴᴀᴍᴇ: {username}\n"
-        f"ᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {total_chat}\n"
-        f"ᴀᴅᴅᴇᴅ ʙʏ: {added_by}\n"
-    )
-
-    # Log the welcome message
-    print(welcome_message)
-
-# Define the command handler for when the bot is added to a new group
-def start(update: Update, context: CallbackContext):
-    print_welcome_message(update, context)
+    chat_name = update.message.chat.title
+    message = f"Bot added to new group!\nGroup Name: {chat_name}\nGroup ID: {chat_id}"
+    send_notification(context.bot, message)
 
 # Set up the bot
 def main():
+    # Replace "YOUR_BOT_TOKEN" with your actual bot token
     updater = Updater("YOUR_BOT_TOKEN", use_context=True)
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler("start", start))
+    # Register the handler for when the bot is added to a new group
+    dp.add_handler(CommandHandler("new_chat", handle_new_chat))
 
     updater.start_polling()
     updater.idle()
