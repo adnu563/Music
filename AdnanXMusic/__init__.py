@@ -3,6 +3,7 @@ from AdnanXMusic.core.dir import dirr
 from AdnanXMusic.core.git import git
 from AdnanXMusic.core.userbot import Userbot
 from AdnanXMusic.misc import dbb, heroku
+from AdnanXMusic import BOT_MENTION, BOT_USERNAME, LOGGER, app
 
 from .logging import LOGGER
 
