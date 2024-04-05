@@ -6,17 +6,11 @@ from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 
-# Assuming you're not using the imported variables
-# BOT_MENTION, BOT_USERNAME, LOGGER, app
-
-# If those variables are necessary, you need to define them somewhere in this script.
-
 # Define your variables here if needed
-# BOT_MENTION = ...
 # BOT_USERNAME = ...
 # LOGGER = ...
-# app = ...
 
+# Assuming 'app' is defined elsewhere in your code
 
 async def song(_, message: Message):
     try:
@@ -37,68 +31,54 @@ async def song(_, message: Message):
         open(thumb_name, "wb").write(thumb.content)
         duration = results[0]["duration"]
 
-    except Exception as ex:
-        LOGGER.error(ex)
-        return await m.edit_text(
-            f"ғᴀɪʟᴇᴅ ᴛᴏ ғᴇᴛᴄʜ ᴛʀᴀᴄᴋ ғʀᴏᴍ ʏᴛ-ᴅʟ.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
-        )
-
-    await m.edit_text("» ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ,\n\nᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
-    try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
+        
         rep = f"☁️ **ᴛɪᴛʟᴇ :** [{title[:23]}]({link})\n⏱️ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}`"
-        secmul, dur, dur_arr = 1, 0, duration.split(":")
+        secmul, dur = 1, 0
+        dur_arr = duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
             secmul *= 60
-        try:
-            visit_butt = InlineKeyboardMarkup(
+        
+        visit_butt = InlineKeyboardMarkup(
+            [
                 [
-                    [
-                        InlineKeyboardButton(
-                            text="ʏᴏᴜᴛᴜʙᴇ",
-                            url=link,
-                        )
-                    ]
+                    InlineKeyboardButton(
+                        text="ʏᴏᴜᴛᴜʙᴇ",
+                        url=link,
+                    )
                 ]
+            ]
+        )
+        
+        await app.send_audio(
+            chat_id=message.from_user.id,
+            audio=audio_file,
+            caption=rep,
+            thumb=thumb_name,
+            title=title,
+            duration=dur,
+            reply_markup=visit_butt,
+        )
+        
+        if message.chat.type != ChatType.PRIVATE:
+            await message.reply_text(
+                "ᴘʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ᴘᴍ, sᴇɴᴛ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ sᴏɴɢ ᴛʜᴇʀᴇ."
             )
-            await app.send_audio(
-                chat_id=message.from_user.id,
-                audio=audio_file,
-                caption=rep,
-                thumb=thumb_name,
-                title=title,
-                duration=dur,
-                reply_markup=visit_butt,
-            )
-            if message.chat.type != ChatType.PRIVATE:
-                await message.reply_text(
-                    "ᴘʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ᴘᴍ, sᴇɴᴛ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ sᴏɴɢ ᴛʜᴇʀᴇ."
-                )
-        except:
-            start_butt = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            text="ᴄʟɪᴄᴋ ʜᴇʀᴇ",
-                            url=f"https://t.me/{BOT_USERNAME}?start",
-                        )
-                    ]
-                ]
-            )
-            return await m.edit_text(
-                text="ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴀɴᴅ sᴛᴀʀᴛ ᴍᴇ ғᴏʀ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢs.",
-                reply_markup=start_butt,
-            )
+        
         await m.delete()
-    except:
-        return await m.edit_text("ғᴀɪʟᴇᴅ ᴛᴏ ᴜᴘʟᴏᴀᴅ ᴀᴜᴅɪᴏ ᴏɴ ᴛᴇʟᴇɢʀᴀᴍ sᴇʀᴠᴇʀs.")
+    except Exception as e:
+        LOGGER.error(e)
+        await m.edit_text("Failed to download or send the audio.")
 
-    try:
-        os.remove(audio_file)
-        os.remove(thumb_name)
-    except Exception as ex:
-        LOGGER.error(ex)
+        try:
+            os.remove(audio_file)
+            os.remove(thumb_name)
+        except Exception as ex:
+            LOGGER.error(ex)
+
+# Add a filter to activate this command
+app.add_message_handler(song, filters.command(["song", "vsong", "video", "music"]))
