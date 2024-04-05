@@ -69,7 +69,7 @@ async def song(_, message: Message):
             await m.edit_text("» ✅ Song downloaded successfully.")
         except Exception as e:
             LOGGER.error(e)
-            )
+       
         await m.delete()
     except Exception as e:
         LOGGER.error(e)
