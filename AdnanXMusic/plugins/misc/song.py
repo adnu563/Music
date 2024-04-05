@@ -2,6 +2,7 @@ import os
 import requests
 import yt_dlp
 import logging
+from PIL import Image
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
@@ -41,6 +42,10 @@ async def song(_, message: Message):
         # Download and save the thumbnail
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, "wb").write(thumb.content)
+        # Resize the thumbnail to 1080 x 720
+        thumb_image = Image.open(thumb_name)
+        thumb_image = thumb_image.resize((1080, 720))
+        thumb_image.save(thumb_name)
         link = f'https://www.youtube.com{results[0]["url_suffix"]}'
         duration = results[0]["duration"]
         total_views = results[0]["views"]
