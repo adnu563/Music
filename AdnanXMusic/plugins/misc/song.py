@@ -47,6 +47,7 @@ async def song(_, message: Message):
                 ➻ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n
                 ➻ ᴛᴏᴛᴀʟ: {total_views}\n\n
                 ➻ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}
+            """
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
