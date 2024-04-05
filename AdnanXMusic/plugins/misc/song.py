@@ -36,7 +36,7 @@ async def song(_, message: Message):
             f"Failed to fetch track from YT-DL.\n\nReason: `{ex}`"
         )
 
-    await m.edit_text("⏳ 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖼𝗂𝗇𝗀 𝖲𝗈𝗇𝗀,𝖯𝗅𝖾𝖺𝗌𝖾 𝖶𝖺𝗂𝗍..!")
+    await m.edit_text("⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
