@@ -7,7 +7,7 @@ from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
-from AdnanXMusic.logging import LOGGER  # Assuming LOGGER is defined correctly in AdnanXMusic.logging
+from AdnanXMusic.logging import LOGGER
 
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
@@ -31,7 +31,7 @@ async def song(_, message: Message):
         total_views = results[0]["views"]
         uploader = results[0]["channel"]
     except Exception as ex:
-        LOGGER.error(ex)
+        LOGGER.error(f"Failed to fetch track from YT-DL. Reason: {ex}")
         return await m.edit_text(
             f"Failed to fetch track from YT-DL.\n\nReason: `{ex}`"
         )
@@ -57,17 +57,17 @@ async def song(_, message: Message):
                 duration=dur,
             )
         except Exception as e:
-            LOGGER.error(e)
+            LOGGER.error(f"Failed to upload audio on Telegram servers. Reason: {e}")
             return await m.edit_text(
                 text="Failed to upload audio on Telegram servers."
             )
         await m.delete()
     except Exception as e:
-        LOGGER.error(ex)
+        LOGGER.error(f"Failed to upload audio on Telegram servers. Reason: {e}")
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
     except Exception as ex:
-        LOGGER.error(ex)
+        LOGGER.error(f"Failed to remove temporary files. Reason: {ex}")
