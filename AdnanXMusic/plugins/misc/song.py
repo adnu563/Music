@@ -1,20 +1,11 @@
 import os
 import requests
 import yt_dlp
-import logging
-from PIL import Image
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 from AdnanXMusic.logging import LOGGER
-
-# Set up logging configuration
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 BOT_MENTION = "AdnanXMusic"
 
@@ -42,54 +33,58 @@ async def song(_, message: Message):
         # Download and save the thumbnail
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, "wb").write(thumb.content)
-        # Resize the thumbnail to 1080 x 720
-        thumb_image = Image.open(thumb_name)
-        thumb_image = thumb_image.resize((1080, 720))
-        thumb_image.save(thumb_name)
         link = f'https://www.youtube.com{results[0]["url_suffix"]}'
         duration = results[0]["duration"]
-        total_views = results[0]["views"]
 
     except Exception as ex:
         # If there's an error fetching the song from YouTube, log the error and inform the user
-        logger.error(ex)
+        LOGGER.error(ex)
         return await m.edit_text(
             f"Failed to fetch track from YouTube.\n\n**Reason: `{ex}`"
         )
 
     # Inform the user that the song is being downloaded
-    await m.edit_text("»⏳ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ꜱᴏɴɢ, ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ..!")
+    await m.edit_text("»⏳ Downloading Song, Please wait...!")
     try:
         # Download the audio from YouTube using youtube-dl
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-
         # Construct a caption for the audio message
-        rep = f"☁️ ᴛɪᴛʟᴇ: {title}\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
-
+        rep = f"☁️ᴛɪᴛʟᴇ: [{title[:23]}]\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
             secmul *= 60
-
-        # Send the audio message with the thumbnail image
+        # Construct an inline keyboard button to link back to the YouTube video
+        visit_butt = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        text="YouTube",
+                        url=link,
+                    )
+                ]
+            ]
+        )
+        # Send the audio message to the chat where the command was received
         await app.send_audio(
             chat_id=message.chat.id,  # Send to the same chat where the command was received
             audio=audio_file,
             caption=rep,
+            thumb=thumb_name,
             title=title,
             duration=dur,
+            reply_markup=visit_butt,
         )
-
         # Inform the user that the song has been successfully downloaded
-        await m.edit_text("» ✅𝚂𝚘𝚗𝚐 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐 𝚂𝚞𝚌𝚌𝚎𝚜𝚜𝚏𝚞𝚕𝚕𝚢.")
+        await m.edit_text("» ✅SONG DOWNLOADED SUCCESSFULLY.")
         # Delete the search message
         await m.delete()
     except Exception as e:
         # If there's an error uploading the audio, inform the user
-        logger.error(e)
+        LOGGER.error(e)
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     # Clean up downloaded files
@@ -97,4 +92,4 @@ async def song(_, message: Message):
         os.remove(audio_file)
         os.remove(thumb_name)
     except Exception as ex:
-        logger.error(ex)
+        LOGGER.error(ex)
