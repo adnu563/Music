@@ -28,7 +28,8 @@ async def song(_, message: Message):
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, "wb").write(thumb.content)
         duration = results[0]["duration"]
-
+        total_views = results[0]["views"]
+        uploader = results[0]["channel"]
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
@@ -41,7 +42,7 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"☁️ ᴛɪᴛʟᴇ: [{title[:23]}]\n⏱️ ᴅᴜʀᴀᴛᴏɴ: {duration}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention('BOT_MENTION')}"
+        rep = f"☁️ ᴛɪᴛʟᴇ: [{title[:23]}]\n⏱️ ᴅᴜʀᴀᴛᴏɴ: {duration}\n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention('BOT_MENTION')}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
