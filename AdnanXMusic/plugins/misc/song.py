@@ -102,5 +102,3 @@ async def song(_, message: Message):
         os.remove(thumb_name)
     except Exception as ex:
         logger.error(ex)
-
-added song thumbnail
