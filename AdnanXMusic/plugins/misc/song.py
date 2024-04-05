@@ -3,8 +3,7 @@ import requests
 import yt_dlp
 import logging
 from PIL import Image
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, APIC
+import eyed3
 from pyrogram import filters
 from pyrogram.types import Message
 from youtube_search import YoutubeSearch
@@ -68,25 +67,13 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         
-        # Embed thumbnail into the audio file
-        try:
-            audio = MP3(audio_file, ID3=ID3)
-            audio.tags.add(
-                APIC(
-                    encoding=3,  # utf-8
-                    mime='image/jpeg',
-                    type=3,  # cover image
-                    desc=u'Cover',
-                    data=open(thumb_name, 'rb').read()
-                )
-            )
-            audio.save()
-        except Exception as e:
-            logger.error(f"Error embedding thumbnail into audio file: {e}")
-            return await m.edit_text("Failed to embed thumbnail into audio file.")
+        # Embed thumbnail into the audio file using eyed3
+        audio = eyed3.load(audio_file)
+        audio.tag.images.set(3, open(thumb_name, 'rb').read(), 'image/jpeg')
+        audio.tag.save()
 
         # Construct a caption for the audio message
-        rep = f"☁️ ᴛɪᴛʟᴇ: {title}\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
+        rep = f"☁️ ᴛɪᴛʟᴇ: [{title[:15]}]\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
 
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
