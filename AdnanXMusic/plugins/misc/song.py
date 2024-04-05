@@ -65,11 +65,6 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        
-        # Embed thumbnail into the audio file using eyed3
-        audio = eyed3.load(audio_file)
-        audio.tag.images.set(3, open(thumb_name, 'rb').read(), 'image/jpeg')
-        audio.tag.save()
 
         # Construct a caption for the audio message
         rep = f"☁️ ᴛɪᴛʟᴇ: {title}\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
@@ -86,13 +81,6 @@ async def song(_, message: Message):
             caption=rep,
             title=title,
             duration=dur,
-        )
-
-        # Send the thumbnail image as a separate message
-        await app.send_photo(
-            chat_id=message.chat.id,
-            photo=thumbnail,
-            caption="YouTube Thumbnail",
         )
 
         # Inform the user that the song has been successfully downloaded
