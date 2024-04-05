@@ -66,7 +66,7 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         # Construct a caption for the audio message
-        rep = f"☁️ 𝚃𝚒𝚝𝚕𝚎: [{title[:23]}]\n⏱ 𝙳𝚞𝚛𝚊𝚝𝚒𝚘𝚗: `{duration}` \n👀 𝚃𝚘𝚝𝚊𝚕 𝚅𝚒𝚎𝚠𝚜: {total_views}\n\n⏳ 𝚄𝚙𝚕𝚘𝚊𝚍𝚎𝚍 𝙱𝚢: {app.mention(BOT_MENTION)}"
+        rep = f"☁️ ᴛɪᴛʟᴇ: [{title[:23]}]\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ ᴠɪᴇᴡs: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
