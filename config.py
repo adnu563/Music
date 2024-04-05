@@ -3,7 +3,6 @@ from os import getenv
 
 from dotenv import load_dotenv
 from pyrogram import filters
-import BOT_MENTION, BOT_USERNAME
 
 load_dotenv()
 
