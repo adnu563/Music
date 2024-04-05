@@ -1,4 +1,5 @@
 import os
+
 import requests
 import yt_dlp
 from pyrogram import filters
@@ -6,7 +7,8 @@ from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 
-# Remove imports related to AdnanXMusic module from here
+from AdnanXMusic import BOT_MENTION, BOT_USERNAME, LOGGER, app
+
 
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
@@ -15,11 +17,6 @@ async def song(_, message: Message):
     except:
         pass
     m = await message.reply_text("🔎")
-    
-    # Move the imports related to AdnanXMusic here inside the function where they are used
-    
-    # Import BOT_MENTION, BOT_USERNAME, LOGGER, and app inside the function
-    from AdnanXMusic import BOT_MENTION, BOT_USERNAME, LOGGER, app
 
     query = "".join(" " + str(i) for i in message.command[1:])
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
