@@ -44,7 +44,7 @@ async def song(_, message: Message):
         )
 
     # Inform the user that the song is being downloaded
-    await m.edit_text("»⏳ 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝗂𝗇𝗀 𝖲𝗈𝗇𝗀, 𝖯𝗅𝖾𝖺𝗌𝖾 𝖶𝖺𝗂𝗍...!")
+    await m.edit_text("»⏳ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ꜱᴏɴɢ, ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ..!")
     try:
         # Download the audio from YouTube using youtube-dl
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -52,7 +52,7 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         # Construct a caption for the audio message
-        rep = f"☁️ 𝚃𝚒𝚝𝚕𝚎: [{title[:23]}]\n⏱ 𝙳𝚞𝚛𝚊𝚝𝚒𝚘𝚗: `{duration}` \n⏳ 𝚄𝚙𝚕𝚘𝚊𝚍𝚎𝚍 𝙱𝚢: {BOT_MENTION}"
+        rep = f"☁️ 𝚃𝚒𝚝𝚕𝚎: [{title[:23]}]\n⏱ 𝙳𝚞𝚛𝚊𝚝𝚒𝚘𝚗: `{duration}` \n👀 𝚃𝚘𝚝𝚊𝚕 𝚅𝚒𝚎𝚠𝚜: {total_views}\n\n⏳ 𝚄𝚙𝚕𝚘𝚊𝚍𝚎𝚍 𝙱𝚢: {app.mention(BOT_MENTION)}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
@@ -79,7 +79,7 @@ async def song(_, message: Message):
             reply_markup=visit_butt,
         )
         # Inform the user that the song has been successfully downloaded
-        await m.edit_text("» ✅𝖲𝗈𝗇𝗀 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝖾𝖽 𝖲𝗎𝖼𝖼𝖾𝗌𝗌𝖿𝗎𝗅𝗅𝗒.")
+        await m.edit_text("» ✅𝚂𝚘𝚗𝚐 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐 𝚂𝚞𝚌𝚌𝚎𝚜𝚜𝚏𝚞𝚕𝚕𝚢.")
         # Delete the search message
         await m.delete()
     except Exception as e:
