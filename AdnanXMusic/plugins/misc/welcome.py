@@ -1,7 +1,6 @@
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import Update
-import app.mention  # Assuming you have a separate module for mention handling
 
 # Set up logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -30,9 +29,6 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
-
-    # Add mention handler
-    dp.add_handler(MessageHandler(Filters.entity("mention"), app.mention.handle_mention))
 
     updater.start_polling()
     updater.idle()
