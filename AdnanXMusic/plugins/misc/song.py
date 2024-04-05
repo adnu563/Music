@@ -1,11 +1,15 @@
 import os
 import requests
 import yt_dlp
-from pyrogram import filters
+from pyrogram import Client, filters
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 
+# Initialize Pyrogram client
+app = Client("AdnanXMusic")
+
+# Command handler
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
@@ -91,3 +95,6 @@ async def song(_, message: Message):
         os.remove(thumb_name)
     except Exception as ex:
         LOGGER.error(ex)
+
+# Run the client
+app.run()
