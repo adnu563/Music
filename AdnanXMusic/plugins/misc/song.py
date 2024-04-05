@@ -9,7 +9,7 @@ from AdnanXMusic.logging import LOGGER
 
 BOT_MENTION = "AdnanXMusic"
 
-@app.on_message(filters.command(["song", "vsong", "video", "music"]))
+@app.on_message(filters.command(["song", "vsong", "video", "music"]) & ~filters.private)
 async def song(_, message: Message):
     try:
         await message.delete()
@@ -21,7 +21,7 @@ async def song(_, message: Message):
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
         results = YoutubeSearch(query, max_results=5).to_dict()
-        title = results[0]["title"][:40]
+        title = results[0]["title"][:80]
         thumbnail = results[0]["thumbnails"][0]
         thumb_name = f"thumb{title}.jpg"
         thumb = requests.get(thumbnail, allow_redirects=True)
@@ -35,7 +35,7 @@ async def song(_, message: Message):
             f"Failed to fetch track from YouTube.\n\n**Reason: `{ex}`"
         )
 
-    await m.edit_text("» ⏳Downloading song, please wait..")
+    await m.edit_text("»⏳ Downloading song, please wait...")
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
