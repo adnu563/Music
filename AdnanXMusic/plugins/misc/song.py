@@ -3,7 +3,8 @@ import requests
 import yt_dlp
 import logging
 from PIL import Image
-from mutagen.mp3 import MP3, Picture
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, APIC
 from pyrogram import filters
 from pyrogram.types import Message
 from youtube_search import YoutubeSearch
