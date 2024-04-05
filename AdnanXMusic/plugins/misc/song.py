@@ -67,22 +67,13 @@ async def song(_, message: Message):
             ydl.process_info(info_dict)
         # Construct a caption for the audio message
         rep = f"☁️ ᴛɪᴛʟᴇ: {title}\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)}\n\n[YouTube Thumbnail]({thumbnail})"
+
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
             secmul *= 60
-        # Construct an inline keyboard button to link back to the YouTube video
-        visit_butt = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(
-                        text="YouTube",
-                        url=link,
-                    )
-                ]
-            ]
-        )
-        # Send the audio message to the chat where the command was received
+
+        # Send the audio message with the thumbnail image
         await app.send_audio(
             chat_id=message.chat.id,  # Send to the same chat where the command was received
             audio=audio_file,
@@ -90,8 +81,15 @@ async def song(_, message: Message):
             thumb=thumb_name,
             title=title,
             duration=dur,
-            reply_markup=visit_butt,
         )
+
+        # Send the thumbnail image as a separate message
+        await app.send_photo(
+            chat_id=message.chat.id,
+            photo=thumbnail,
+            caption="YouTube Thumbnail",
+        )
+
         # Inform the user that the song has been successfully downloaded
         await m.edit_text("» ✅𝚂𝚘𝚗𝚐 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐 𝚂𝚞𝚌𝚌𝚎𝚜𝚜𝚏𝚞𝚕𝚕𝚢.")
         # Delete the search message
