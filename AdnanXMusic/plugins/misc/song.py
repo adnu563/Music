@@ -7,7 +7,7 @@ from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
-from AdnanXMusic.logging import LOGGER
+from AdnanXMusic.logging import LOGGER  # Assuming LOGGER is defined correctly in AdnanXMusic.logging
 
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
@@ -36,13 +36,13 @@ async def song(_, message: Message):
             f"Failed to fetch track from YT-DL.\n\nReason: `{ex}`"
         )
 
-    await m.edit_text("⏳𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖼𝗂𝗇𝗀 𝖲𝗈𝗇𝗀, 𝖯𝗅𝖾𝖺𝗌𝖾 𝖶𝖺𝗂𝗍..!")
+    await m.edit_text("⏳Downloading Song, Please Wait..!")
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"➻ ᴛɪᴛʟᴇ: {title[:20]}\n➻ ᴅᴜʀᴀᴛᴏɴ: {duration}\n➻ ᴛᴏᴛᴀʟ: {total_views}\n\n➻ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}"
+        rep = f"➻ ᴛɪᴛʟᴇ: {title[:20]}\n➻ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➻ ᴛᴏᴛᴀʟ: {total_views}\n\n➻ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}"
         secmul, dur, dur_arr = 0.5, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
