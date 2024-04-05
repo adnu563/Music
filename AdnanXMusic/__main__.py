@@ -11,7 +11,6 @@ from AdnanXMusic.misc import sudo
 from AdnanXMusic.plugins import ALL_MODULES
 from AdnanXMusic.utils.database import get_banned_users, get_gbanned
 from config import BANNED_USERS
-from AdnanXMusic import BOT_MENTION
 
 
 async def init():
