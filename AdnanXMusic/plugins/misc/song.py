@@ -81,4 +81,4 @@ async def song(_, message: Message):
             LOGGER.error(ex)
 
 # Add a filter to activate this command
-app.add_message_handler(song, filters.command(["song", "vsong", "video", "music"]))
+app.on_message(song, filters.command(["song", "vsong", "video", "music"]))
