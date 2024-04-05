@@ -40,3 +40,15 @@ def kick_user_from_group(chat_id, user_id):
     logging.info(f"Kicked user {user_id} from group {chat_id}")
     logging.info(f"Response: {response.json()}")
     return response.json()
+
+# Example usage to send new group information message
+def example_send_new_group_info():
+    chat_name = "New Group"
+    chat_id = "YOUR_GROUP_CHAT_ID"
+    username = "example_group"
+    total_chat = 50
+    added_by = "admin_user"
+    message = new_group_info(chat_name, chat_id, username, total_chat, added_by)
+    send_message_to_group(chat_id, message)
+
+example_send_new_group_info()
