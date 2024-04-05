@@ -3,7 +3,6 @@ import requests
 import yt_dlp
 import logging
 from PIL import Image
-import eyed3
 from pyrogram import filters
 from pyrogram.types import Message
 from youtube_search import YoutubeSearch
