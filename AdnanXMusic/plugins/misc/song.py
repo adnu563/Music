@@ -94,6 +94,5 @@ async def song(_, message: Message):
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
-        except Exception as e:
+        except Exception as ex:
                 print(f"Error sending message: {e}")
-
