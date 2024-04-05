@@ -1,11 +1,19 @@
 import os
 import requests
 import yt_dlp
+import logging
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 from AdnanXMusic.logging import LOGGER
+
+# Set up logging configuration
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 BOT_MENTION = "AdnanXMusic"
 
@@ -35,10 +43,11 @@ async def song(_, message: Message):
         open(thumb_name, "wb").write(thumb.content)
         link = f'https://www.youtube.com{results[0]["url_suffix"]}'
         duration = results[0]["duration"]
+        total_views = results[0]["views"]
 
     except Exception as ex:
         # If there's an error fetching the song from YouTube, log the error and inform the user
-        LOGGER.error(ex)
+        logger.error(ex)
         return await m.edit_text(
             f"Failed to fetch track from YouTube.\n\n**Reason: `{ex}`"
         )
@@ -84,7 +93,7 @@ async def song(_, message: Message):
         await m.delete()
     except Exception as e:
         # If there's an error uploading the audio, inform the user
-        LOGGER.error(e)
+        logger.error(e)
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     # Clean up downloaded files
@@ -92,4 +101,6 @@ async def song(_, message: Message):
         os.remove(audio_file)
         os.remove(thumb_name)
     except Exception as ex:
-        LOGGER.error(ex)
+        logger.error(ex)
+
+added song thumbnail
