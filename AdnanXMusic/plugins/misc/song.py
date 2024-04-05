@@ -69,17 +69,21 @@ async def song(_, message: Message):
             ydl.process_info(info_dict)
         
         # Embed thumbnail into the audio file
-        audio = MP3(audio_file, ID3=ID3)
-        audio.tags.add(
-            APIC(
-                encoding=3,  # utf-8
-                mime='image/jpeg',
-                type=3,  # cover image
-                desc=u'Cover',
-                data=open(thumb_name, 'rb').read()
+        try:
+            audio = MP3(audio_file, ID3=ID3)
+            audio.tags.add(
+                APIC(
+                    encoding=3,  # utf-8
+                    mime='image/jpeg',
+                    type=3,  # cover image
+                    desc=u'Cover',
+                    data=open(thumb_name, 'rb').read()
+                )
             )
-        )
-        audio.save()
+            audio.save()
+        except Exception as e:
+            logger.error(f"Error embedding thumbnail into audio file: {e}")
+            return await m.edit_text("Failed to embed thumbnail into audio file.")
 
         # Construct a caption for the audio message
         rep = f"☁️ ᴛɪᴛʟᴇ: {title}\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
