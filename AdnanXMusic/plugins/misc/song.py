@@ -41,7 +41,7 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"☁️Title: [{title[:23]}]\n⏱ Duration: `{duration}`\n ⏳Uploaded by: {BOT_MENTION}"
+        rep = f"☁️Title: [{title[:23]}]\n⏱ Duration: `{duration}`\n ⏳ Uploaded by: {BOT_MENTION}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
@@ -66,10 +66,7 @@ async def song(_, message: Message):
                 duration=dur,
                 reply_markup=visit_butt,
             )
-            if message.chat.type != 'private':
-                await message.reply_text(
-                    "Please check your PM, sent the requested song there."
-                )
+            await m.edit_text("» ✅ Song downloaded successfully.")
         except Exception as e:
             LOGGER.error(e)
             start_butt = InlineKeyboardMarkup(
