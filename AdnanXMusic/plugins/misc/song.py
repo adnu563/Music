@@ -9,7 +9,6 @@ from AdnanXMusic.logging import LOGGER
 
 BOT_MENTION = "AdnanXMusic"
 
-
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
@@ -18,7 +17,7 @@ async def song(_, message: Message):
         pass
     m = await message.reply_text("🔎")
 
-    query = "".join(" " + str(i) for i in message.command[1:])
+    query = " ".join(message.command[1:])
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
         results = YoutubeSearch(query, max_results=5).to_dict()
@@ -27,21 +26,22 @@ async def song(_, message: Message):
         thumb_name = f"thumb{title}.jpg"
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, "wb").write(thumb.content)
+        link = f'https://www.youtube.com{results[0]["url_suffix"]}'
         duration = results[0]["duration"]
 
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
-            f"ғᴀɪʟᴇᴅ ᴛᴏ ғᴇᴛᴄʜ ᴛʀᴀᴄᴋ ғʀᴏᴍ ʏᴛ-ᴅʟ.\n\n**ʀᴇᴀsᴏɴ : `{ex}`"
+            f"Failed to fetch track from YouTube.\n\n**Reason: `{ex}`"
         )
 
-    await m.edit_text("» ⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ..")
+    await m.edit_text("» ⏳Downloading song, please wait..")
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"☁️ᴛɪᴛʟᴇ : [{title[:23]}]\n⏱ ᴅᴜʀᴀᴛɪᴏɴ : `{duration}`\n ⏳ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ : {BOT_MENTION}"
+        rep = f"☁️Title: [{title[:23]}]\n⏱ Duration: `{duration}`\n ⏳Uploaded by: {BOT_MENTION}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
@@ -51,7 +51,7 @@ async def song(_, message: Message):
                 [
                     [
                         InlineKeyboardButton(
-                            text="ʏᴏᴜᴛᴜʙᴇ",
+                            text="YouTube",
                             url=link,
                         )
                     ]
@@ -66,31 +66,34 @@ async def song(_, message: Message):
                 duration=dur,
                 reply_markup=visit_butt,
             )
-            if message.chat.type != ChatType.PRIVATE:
+            if message.chat.type != 'private':
                 await message.reply_text(
-                    "ᴘʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ᴘᴍ, sᴇɴᴛ ᴛʜᴇ ʀᴇǫᴜᴇsᴛᴇᴅ sᴏɴɢ ᴛʜᴇʀᴇ."
+                    "Please check your PM, sent the requested song there."
                 )
-        except:
+        except Exception as e:
+            LOGGER.error(e)
             start_butt = InlineKeyboardMarkup(
                 [
                     [
                         InlineKeyboardButton(
-                            text="ᴄʟɪᴄᴋ ʜᴇʀᴇ",
+                            text="Click Here",
                             url=f"https://t.me/{BOT_USERNAME}?start",
                         )
                     ]
                 ]
             )
             return await m.edit_text(
-                text="ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴀɴᴅ sᴛᴀʀᴛ ᴍᴇ ғᴏʀ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢs.",
+                text="Click on the button below and start me for downloading songs.",
                 reply_markup=start_butt,
             )
         await m.delete()
-    except:
-        return await m.edit_text("ғᴀɪʟᴇᴅ ᴛᴏ ᴜᴘʟᴏᴀᴅ ᴀᴜᴅɪᴏ ᴏɴ ᴛᴇʟᴇɢʀᴀᴍ sᴇʀᴠᴇʀs.")
+    except Exception as e:
+        LOGGER.error(e)
+        return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
-    except Exception as ex:
-        LOGGER.error(ex)
+        except Exception as e:
+                print(f"Error sending message: {e}")
+
