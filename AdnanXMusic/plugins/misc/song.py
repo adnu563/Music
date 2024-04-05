@@ -3,8 +3,9 @@ import requests
 import yt_dlp
 import logging
 from PIL import Image
+from mutagen.mp3 import MP3, Picture
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 from AdnanXMusic.logging import LOGGER
@@ -65,8 +66,22 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
+        
+        # Embed thumbnail into the audio file
+        audio = MP3(audio_file, ID3=ID3)
+        audio.tags.add(
+            APIC(
+                encoding=3,  # utf-8
+                mime='image/jpeg',
+                type=3,  # cover image
+                desc=u'Cover',
+                data=open(thumb_name, 'rb').read()
+            )
+        )
+        audio.save()
+
         # Construct a caption for the audio message
-        rep = f"☁️ ᴛɪᴛʟᴇ: {title}\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)}\n\n[YouTube Thumbnail]({thumbnail})"
+        rep = f"☁️ ᴛɪᴛʟᴇ: {title}\n⏱ ᴅᴜʀᴀᴛᴏɴ: `{duration}` \n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
 
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
@@ -78,7 +93,6 @@ async def song(_, message: Message):
             chat_id=message.chat.id,  # Send to the same chat where the command was received
             audio=audio_file,
             caption=rep,
-            thumb=thumb_name,
             title=title,
             duration=dur,
         )
