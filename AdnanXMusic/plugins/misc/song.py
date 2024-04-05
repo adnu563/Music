@@ -35,13 +35,13 @@ async def song(_, message: Message):
             f"Failed to fetch track from YT-DL.\n\nReason: `{ex}`"
         )
 
-    await m.edit_text("» Downloading song,\n\nPlease wait...")
+    await m.edit_text("»⏳ 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽𝗂𝗇𝗀 𝖲𝗈𝗇𝗀, 𝖯𝗅𝖾𝖺𝗌𝖾 𝖶𝖺𝗂𝗍..!")
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"☁️ **Title:** [{title[:23]}]({link})\n⏱️ **Duration:** `{duration}`"
+        rep = f"☁️ ᴛɪᴛʟᴇ: [{title[:23]}]()\n⏱️ ᴅᴜʀᴀᴛᴏɴ: {duration}\n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
