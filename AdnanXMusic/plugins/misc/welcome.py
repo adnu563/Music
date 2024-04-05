@@ -1,6 +1,7 @@
 import logging
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import Update
+import app.mention  # Assuming you have a separate module for mention handling
 
 # Set up logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -13,6 +14,13 @@ def start(update: Update, context):
     group_id = update.message.chat.id
     group_count = len(context.bot.get_chat_member(chat_id, user_id).user.joined_chat_ids)
     
+    # Logging
+    logger.info(f"User ID: {user_id}")
+    logger.info(f"Chat ID: {chat_id}")
+    logger.info(f"Group Title: {group_title}")
+    logger.info(f"Group ID: {group_id}")
+    logger.info(f"Group Count: {group_count}")
+    
     # Displaying information
     message = f"You've been added to the group '{group_title}' (Group ID: {group_id}, Chat ID: {chat_id}).\nTotal groups: {group_count}"
     context.bot.send_message(chat_id=user_id, text=message)
@@ -22,6 +30,9 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
+
+    # Add mention handler
+    dp.add_handler(MessageHandler(Filters.entity("mention"), app.mention.handle_mention))
 
     updater.start_polling()
     updater.idle()
