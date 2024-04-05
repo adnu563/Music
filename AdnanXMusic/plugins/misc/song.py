@@ -82,9 +82,9 @@ async def song(_, message: Message):
         await m.edit_text("» ✅𝚂𝚘𝚗𝚐 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐 𝚂𝚞𝚌𝚌𝚎𝚜𝚜𝚏𝚞𝚕𝚕𝚢.")
         # Delete the search message
         await m.delete()
-    except Exception as e:
+    except Exception as ex:
         # If there's an error uploading the audio, inform the user
-        LOGGER.error(e)
+        LOGGER.error(ex)
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     # Clean up downloaded files
