@@ -4,7 +4,7 @@ import yt_dlp
 import logging
 from PIL import Image
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 from AdnanXMusic.logging import LOGGER
@@ -41,22 +41,12 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"☁️ Title: [{title[:23]}]\n⏱️ Duration: {duration}\n👀 ᴛᴏᴛᴀʟ: {total_views}\n\n⏳ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention(BOT_MENTION)})"
+        rep = f"☁️ **Title:** [{title[:23]}]({link})\n⏱️ **Duration:** `{duration}`"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
             secmul *= 60
         try:
-            visit_butt = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            text="YouTube",
-                            url=link,
-                        )
-                    ]
-                ]
-            )
             await app.send_audio(
                 chat_id=message.chat.id,
                 audio=audio_file,
@@ -64,7 +54,6 @@ async def song(_, message: Message):
                 thumb=thumb_name,
                 title=title,
                 duration=dur,
-                reply_markup=visit_butt,
             )
         except:
             return await m.edit_text(
