@@ -7,8 +7,6 @@ from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 from AdnanXMusic.logging import LOGGER
 
-BOT_MENTION = AdnanXMusic
-
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
