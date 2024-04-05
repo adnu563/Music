@@ -44,7 +44,7 @@ async def song(_, message: Message):
         )
 
     # Inform the user that the song is being downloaded
-    await m.edit_text("»⏳ Downloading Song, Please wait...!")
+    await m.edit_text("»⏳ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ꜱᴏɴɢ, \nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ..!")
     try:
         # Download the audio from YouTube using youtube-dl
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -79,7 +79,7 @@ async def song(_, message: Message):
             reply_markup=visit_butt,
         )
         # Inform the user that the song has been successfully downloaded
-        await m.edit_text("» ✅SONG DOWNLOADED SUCCESSFULLY.")
+        await m.edit_text("» ✅𝚂𝚘𝚗𝚐 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐 𝚂𝚞𝚌𝚌𝚎𝚜𝚜𝚏𝚞𝚕𝚕𝚢.")
         # Delete the search message
         await m.delete()
     except Exception as e:
