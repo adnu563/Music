@@ -67,22 +67,7 @@ async def song(_, message: Message):
                 reply_markup=visit_butt,
             )
             await m.edit_text("» ✅ Song downloaded successfully.")
-        except Exception as e:
-            LOGGER.error(e)
-            start_butt = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            text="Click Here",
-                            url=f"https://t.me/{BOT_USERNAME}?start",
-                        )
-                    ]
-                ]
-            )
-            return await m.edit_text(
-                text="Click on the button below and start me for downloading songs.",
-                reply_markup=start_butt,
-            )
+    
         await m.delete()
     except Exception as e:
         LOGGER.error(e)
