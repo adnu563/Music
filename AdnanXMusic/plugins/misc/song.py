@@ -42,7 +42,7 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"➻ ᴛɪᴛʟᴇ: {title[:23]}\n➻ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➻ ᴛᴏᴛᴀʟ: {total_views}\n\n➻ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {BOT_MENTION}"
+        rep = f"➻ ᴛɪᴛʟᴇ: {title[:23]}\n➻ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➻ ᴛᴏᴛᴀʟ: {total_views}\n\n➻ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention, {"bot_mention"}}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
@@ -62,8 +62,9 @@ async def song(_, message: Message):
                 text="Failed to upload audio on Telegram servers."
             )
         await m.delete()
-            except Exception as e:
-                print(f"Error sending message: {e}")
+        except Exception as ex:
+        LOGGER.error(e)
+        return await m.edit_text("Failed to upload audio on Telegram servers.")
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
