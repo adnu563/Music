@@ -9,6 +9,7 @@ from AdnanXMusic.logging import LOGGER
 
 BOT_MENTION = "AdnanXMusic"
 
+
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
@@ -20,29 +21,27 @@ async def song(_, message: Message):
     query = "".join(" " + str(i) for i in message.command[1:])
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
-         results = VideosSearch(query, limit=1)
-            for result in results.result()["result"]:
-                title = result["title"]
-                duration = result["duration"]
-                views = result["viewCount"]["short"]
-                thumbnail = result["thumbnails"][0]["url"]
-                (result["link"])
-                (result["id"])
-                videoid = result["id"]
+        results = YoutubeSearch(query, max_results=5).to_dict()
+        title = results[0]["title"][:40]
+        thumbnail = results[0]["thumbnails"][0]
+        thumb_name = f"thumb{title}.jpg"
+        thumb = requests.get(thumbnail, allow_redirects=True)
+        open(thumb_name, "wb").write(thumb.content)
+        duration = results[0]["duration"]
 
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
-            f"ғᴀɪʟᴇᴅ ᴛᴏ ғᴇᴛᴄʜ ᴛʀᴀᴄᴋ ғʀᴏᴍ ʏᴛ-ᴅʟ.\n\n**ʀᴇᴀsᴏɴ :** `{ex}`"
+            f"ғᴀɪʟᴇᴅ ᴛᴏ ғᴇᴛᴄʜ ᴛʀᴀᴄᴋ ғʀᴏᴍ ʏᴛ-ᴅʟ.\n\n**ʀᴇᴀsᴏɴ : `{ex}`"
         )
 
-    await m.edit_text("» ⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ, \nᴘʟᴇᴀsᴇ ᴡᴀɪᴛ..")
+    await m.edit_text("» ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ,\n\nᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        rep = f"☁️ **ᴛɪᴛʟᴇ :** [{title[:23]}]({link})\n⏱️ **ᴅᴜʀᴀᴛɪᴏɴ :** `{duration}`\n🥀 **ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ :** {BOT_MENTION}"
+        rep = f"☁️ᴛɪᴛʟᴇ : [{title[:23]}]\n⏱ ᴅᴜʀᴀᴛɪᴏɴ : `{duration}`\n ⏳ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ : {BOT_MENTION}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
