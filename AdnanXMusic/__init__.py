@@ -3,8 +3,8 @@ from AdnanXMusic.core.dir import dirr
 from AdnanXMusic.core.git import git
 from AdnanXMusic.core.userbot import Userbot
 from AdnanXMusic.misc import dbb, heroku
-
 from .logging import LOGGER
+from .config import BOT_MENTION, BOT_USERNAME
 
 dirr()
 git()
@@ -13,7 +13,6 @@ heroku()
 
 app = Adnany()
 userbot = Userbot()
-
 
 from .platforms import *
 
