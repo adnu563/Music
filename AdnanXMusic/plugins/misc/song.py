@@ -13,12 +13,14 @@ from AdnanXMusic.logging import LOGGER
 async def song(_, message: Message):
     try:
         await message.delete()
-    except:
-        pass
+    except Exception as e:
+        LOGGER.error(e)
+
     m = await message.reply_text("🔎")
 
-    query = "".join(" " + str(i) for i in message.command[1:])
+    query = " ".join(message.command[1:])
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
+
     try:
         results = YoutubeSearch(query, max_results=5).to_dict()
         link = f"https://youtube.com{results[0]['url_suffix']}"
@@ -37,34 +39,35 @@ async def song(_, message: Message):
         )
 
     await m.edit_text("⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
+
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
+
         rep = f"➻ ᴛɪᴛʟᴇ: {title[:23]}\n➻ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➻ ᴛᴏᴛᴀʟ: {total_views}\n\n➻ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: (app.mention{bot_mention})"
-        secmul, dur, dur_arr = 1, 0, duration.split(":")
+        secmul, dur = 1, 0
+        dur_arr = duration.split(":")
+        
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
-            secmul *= 45
-        try:
-            await app.send_audio(
-                chat_id=message.chat.id,
-                audio=audio_file,
-                caption=rep,
-                thumb=thumb_name,
-                title=title,
-                duration=dur,
-            )
-        except Exception as e:
-            LOGGER.error(e)
-            return await m.edit_text(
-                text="Failed to upload audio on Telegram servers."
-            )
+            secmul *= 60
+
+        await app.send_audio(
+            chat_id=message.chat.id,
+            audio=audio_file,
+            caption=rep,
+            thumb=thumb_name,
+            title=title,
+            duration=dur
+        )
         await m.delete()
-        except Exception as e:
-        LOGGER.error(ex)
-        return await m.edit_text("Failed to upload audio on Telegram servers.")
+
+    except Exception as e:
+        LOGGER.error(e)
+        await m.edit_text("Failed to upload audio on Telegram servers.")
+
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
