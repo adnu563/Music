@@ -64,12 +64,9 @@ async def song(_, message: Message):
         )
         await m.delete()
 
-    except Exception as e:
-        LOGGER.error(ex)
-        await m.edit_text("Failed to upload audio on Telegram servers.")
-
-    try:
         os.remove(audio_file)
         os.remove(thumb_name)
-    except Exception as ex:
-        LOGGER.error(ex)
+
+    except Exception as e:
+        LOGGER.error(e)
+        await m.edit_text("Failed to upload audio on Telegram servers.")
