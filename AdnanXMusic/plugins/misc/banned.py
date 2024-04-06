@@ -17,7 +17,13 @@ async def send_message_to_logger(chat_id: int, message: str):
 
 @app.on_chat_member_updated()
 async def on_bot_kicked_from_chat(client: Client, chat_member_updated: ChatMemberUpdated):
-    if chat_member_updated.old_chat_member and chat_member_updated.old_chat_member.status != "left" and chat_member_updated.new_chat_member.status == "left" and chat_member_updated.new_chat_member.user.id == client.get_me().id:
+    if (
+        chat_member_updated.old_chat_member
+        and chat_member_updated.old_chat_member.status != "left"
+        and chat_member_updated.new_chat_member
+        and chat_member_updated.new_chat_member.status == "left"
+        and chat_member_updated.new_chat_member.user.id == client.get_me().id
+    ):
         removed_by = chat_member_updated.from_user.first_name if chat_member_updated.from_user else "Unknown User"
         chatname = chat_member_updated.chat.title if chat_member_updated.chat.title else "Unnamed Chat"
         chat_id = chat_member_updated.chat.id
