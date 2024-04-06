@@ -19,6 +19,12 @@ async def download_file(url, filename):
                             break
                         f.write(chunk)
 
+@app.on_message(filters.command(["start"]))
+async def start(_, message: Message):
+    await message.reply_text(
+        "Hi there! I am a music bot. Just send me the name of the song you want to listen to, and I'll find it for you!"
+    )
+
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
@@ -65,13 +71,13 @@ async def song(_, message: Message):
             dur += int(dur_arr[i]) * secmul
             secmul *= 45
 
-        # Send audio with thumbnail
+        # Send audio with thumbnail and tracking information in the title
         await app.send_audio(
             chat_id=message.chat.id,
             audio=audio_file,
-            caption=f"»ᴛɪᴛʟᴇ: {title[:23]}\n»ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n»ᴛᴏᴛᴀʟ: {total_views}\n\n➻ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
+            caption=f"»ᴛɪᴛʟᴇ: {title[:23]}\n»ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n»ᴛᴏᴛᴀʟ: {total_views}\n\n→ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             thumb=thumb_name,
-            title=title,
+            title=title,  # Add the title to the message
             duration=dur
         )
         await m.delete()
@@ -83,3 +89,12 @@ async def song(_, message: Message):
     except Exception as e:
         LOGGER.error(e)
         await m.edit_text("Failed to upload audio on Telegram servers.")
+
+@app.on_message(filters.private & filters.command(["info"]))
+async def info(_, message: Message):
+    await message.reply_text(
+        "This is a music bot. Just send me the name of the song you want to listen to, and I'll find it for you!"
+    )
+
+# Adding Song Title Information to the track
+LOGGER.info("Song Title Added ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ information mention")
