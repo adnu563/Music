@@ -1,7 +1,7 @@
 import os
 import asyncio
 from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram.types import Chat
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import get_served_chats
 
@@ -15,17 +15,17 @@ async def send_message_to_logger(chat_id: int, message: str):
     except Exception as e:
         print(f"Failed to send message to logger: {e}")
 
-@app.on_message(filters.left_chat_member)
-async def on_left_chat_member(client: Client, message: Message):
-    if message.left_chat_member.id == (await client.get_me()).id:
-        removed_by = message.from_user.first_name if message.from_user else "ᴜɴᴋɴᴏᴡɴ ᴜsᴇʀ"
-        chatname = message.chat.title  # Changed matlabi_jhanto to chatname
-        chat_id = message.chat.id
-        if message.chat.username:
-            chatusername = f"@{message.chat.username}"
+@app.on_chat_kicked()
+async def on_bot_kicked_from_chat(client: Client, chat: Chat, by: Chat):
+    if chat.type in ("group", "supergroup") and by.id == (await client.get_me()).id:
+        removed_by = by.first_name if by else "Unknown User"
+        chatname = chat.title if chat.title else "Unnamed Chat"
+        chat_id = chat.id
+        if chat.username:
+            chatusername = f"@{chat.username}"
         else:
-            chatusername = "ᴩʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
-        message_text = f"Bot removed from group\n\nChat Name: {chatname}\nChat ID: {chat_id}\nUsername: {chatusername}\nRemoved by: {removed_by}"
+            chatusername = "Private Chat"
+        message_text = f"Bot banned from group\n\nChat Name: {chatname}\nChat ID: {chat_id}\nUsername: {chatusername}\nBanned by: {removed_by}"
         logger_id = get_logger_id()  # Fetch the logger ID
         await send_message_to_logger(logger_id, message_text)
 
