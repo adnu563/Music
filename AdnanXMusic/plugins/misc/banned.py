@@ -1,7 +1,6 @@
 import os
 import asyncio
 from pyrogram import Client, filters
-from pyrogram.types import ChatMembersFilter, ChatMember
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import get_served_chats
 
@@ -12,8 +11,8 @@ def get_logger_id():
 async def lul_message(chat_id: int, message: str):
     await app.send_message(chat_id=chat_id, text=message)
 
-@app.on_chat_member_left(filters.me)
-async def on_bot_removed(client: Client, message: ChatMember):
+@app.on_message(filters.chat_action("left"))
+async def on_bot_removed(client: Client, message):
     chatname = message.chat.title
     served_chats = len(await get_served_chats())
     chat_id = message.chat.id
