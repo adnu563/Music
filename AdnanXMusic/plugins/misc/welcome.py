@@ -4,12 +4,8 @@ from pyrogram.types import Message
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import get_served_chats
 
-# Read LOG_GROUP_ID from environment variables
-LOG_GROUP_ID = int(os.environ.get('LOG_GROUP_ID', ''))  # Default value is used if not found in environment
-
 async def lul_message(chat_id: int, message: str):
     await app.send_message(chat_id=chat_id, text=message)
-
 
 @app.on_message(filters.new_chat_members)
 async def on_new_chat_members(client: Client, message: Message):
@@ -23,6 +19,6 @@ async def on_new_chat_members(client: Client, message: Message):
         else:
             chatusername = "ᴩʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
         lemda_text = f"🌹 ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ ..\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {matlabi_jhanto}\nᴄʜᴀᴛ ɪᴅ: {chat_id}\n┣ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\nᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\nᴀᴅᴅᴇᴅ ʙʏ:{added_by}"
-        await lul_message(LOG_GROUP_ID, lemda_text)
+        await lul_message(123456789, lemda_text)  # Replace 123456789 with the desired group ID
 
 app.run()
