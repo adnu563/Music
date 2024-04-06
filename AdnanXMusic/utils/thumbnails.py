@@ -73,43 +73,20 @@ async def get_thumb(videoid):
         draw = ImageDraw.Draw(background)
         arial = ImageFont.truetype("AdnanXMusic/assets/font2.ttf", 30)
         font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
-        draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
-        draw.text(
-            (55, 560),
-            f"{channel} | {views[:23]}",
-            (255, 255, 255),
-            font=arial,
-        )
-        draw.text(
-            (57, 600),
-            clear(title),
-            (255, 255, 255),
-            font=font,
-        )
-        draw.line(
-            [(55, 660), (1220, 660)],
-            fill="white",
-            width=5,
-            joint="curve",
-        )
-        draw.ellipse(
-            [(918, 648), (942, 672)],
-            outline="white",
-            fill="white",
-            width=15,
-        )
-        draw.text(
-            (36, 685),
-            "00:00",
-            (255, 255, 255),
-            font=arial,
-        )
-        draw.text(
-            (1185, 685),
-            f"{duration[:23]}",
-            (255, 255, 255),
-            font=arial,
-        )
+        draw.text((20, 20), unidecode(app.name), fill="white", font=arial)  # Top left corner
+        draw.text((55, 560), f"{channel} | {views[:23]}", (255, 255, 255), font=arial)  # Footer middle
+        draw.text((57, 600), clear(title), (255, 255, 255), font=font)  # Body down, song name
+        draw.line([(55, 660), (1220, 660)], fill="white", width=5, joint="curve")  # Line separator
+        draw.ellipse([(918, 648), (942, 672)], outline="white", fill="white", width=15)  # Symbol
+        draw.text((36, 685), "00:00", (255, 255, 255), font=arial)  # Time start
+        draw.text((1185, 685), f"{duration[:23]}", (255, 255, 255), font=arial)  # Time end
+        draw.text((980, 685), "●", (255, 255, 255), font=arial)  # Current time marker
+        draw.text((1010, 685), "──", (255, 255, 255), font=arial)  # Separator
+        draw.text((1070, 685), "●", (255, 255, 255), font=arial)  # End time marker
+        draw.text((1100, 685), "03:23", (255, 255, 255), font=arial)  # Total duration
+        draw.text((1160, 685), "↻", (255, 255, 255), font=arial)  # Repeat icon
+        draw.text((1200, 685), "♡", (255, 255, 255), font=arial)  # Like icon
+
         try:
             os.remove(f"cache/thumb{videoid}.png")
         except:
