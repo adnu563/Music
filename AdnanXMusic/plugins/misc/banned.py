@@ -24,7 +24,7 @@ async def on_chat_member_updated(client, message):
         
         removed_by = message.from_user.mention
         
-        lemda_text = f"➻ ʙᴏᴛ ʀᴇᴍᴏᴠᴇᴅ ʙʏ: {removed_by} ꜰʀᴏᴍ ᴛʜɪs ɢʀᴏᴜᴘ! 😢\n\n‣ ᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\n‣ ᴄʜᴀᴛ ɪᴅ: {chat_id}\n‣ ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\n‣ ᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}"
+        lemda_text = f"➻ ʙᴏᴛ ʀᴇᴍᴏᴠᴇᴅ ꜰʀᴏᴍ ᴛʜɪs ɢʀᴏᴜᴘ! 😢\n\n‣ ᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\n‣ ᴄʜᴀᴛ ɪᴅ: {chat_id}\n‣ ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\n‣ ᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\n‣ ʙᴏᴛ ʀᴇᴍᴏᴠᴇᴅ ʙʏ: {removed_by}"
         
         logger_id = get_logger_id()  # Fetch the logger ID
         await lul_message(logger_id, lemda_text)
