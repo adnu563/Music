@@ -1,9 +1,11 @@
+import os
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import get_served_chats
-from config import LOG_GROUP_ID
 
+# Read LOG_GROUP_ID from environment variables
+LOG_GROUP_ID = int(os.environ.get('LOG_GROUP_ID', ''))  # Default value is used if not found in environment
 
 async def lul_message(chat_id: int, message: str):
     await app.send_message(chat_id=chat_id, text=message)
