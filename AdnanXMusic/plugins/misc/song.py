@@ -54,7 +54,6 @@ async def song(_, message: Message):
             dur += int(dur_arr[i]) * secmul
             secmul *= 45
 
-      try:
         await app.send_audio(
             chat_id=message.chat.id,
             audio=audio_file,
