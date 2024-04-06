@@ -1,3 +1,5 @@
+from pyrogram import filters
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from AdnanXMusic import app  # Assuming `app` is the Flask app instance
 from AdnanXMusic.logging import logger
 
