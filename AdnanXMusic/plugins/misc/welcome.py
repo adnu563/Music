@@ -23,7 +23,7 @@ async def on_new_chat_members(client: Client, message: Message):
             chatusername = f"@{message.chat.username}"
         else:
             chatusername = "ᴩʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
-        lemda_text = f"ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ..!🥳\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\nᴄʜᴀᴛ ɪᴅ: {chat_id}\nᴜsᴇʀɴᴀᴍᴇ: {chatusername}\nᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\nᴀᴅᴅᴇᴅ ʙʏ:{added_by}"
+        lemda_text = f"➻ ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ! 🥳\n\n‣ ᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\n‣ ᴄʜᴀᴛ ɪᴅ: {chat_id}\n‣ ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\n‣ ᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\n‣ ᴀᴅᴅᴇᴅ ʙʏ:{added_by}"
         logger_id = get_logger_id()  # Fetch the logger ID
         await lul_message(logger_id, lemda_text)
 
