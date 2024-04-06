@@ -7,25 +7,39 @@ from AdnanXMusic.utils.database import get_served_chats
 
 # Function to fetch the Logger ID
 def get_logger_id():
-    return os.environ.get("LOGGER_ID")  # Fetch the logger ID from environment variable
+    return os.environ.get("LOGGER_ID")  # Assuming LOGGER_ID is set as an environment variable
 
 async def lul_message(chat_id: int, message: str):
-    try:
-        await app.send_message(chat_id=chat_id, text=message)
-    except Exception as e:
-        print(f"Error sending message to logger: {e}")
+    await app.send_message(chat_id=chat_id, text=message)
 
-@app.on_message(filters.group & filters.left_chat_member)
-async def on_bot_kicked(client: Client, message: Message):
-    if message.left_chat_member and message.left_chat_member.id == (await client.get_me()).id:
-        chatname = message.chat.title  # Get the name of the chat
+@app.on_message(filters.new_chat_members)
+async def on_new_chat_members(client: Client, message: Message):
+    if (await client.get_me()).id in [user.id for user in message.new_chat_members]:
+        added_by = message.from_user.first_name if message.from_user else "ᴜɴᴋɴᴏᴡɴ ᴜsᴇʀ"
+        chatname = message.chat.title  # Changed matlabi_jhanto to chatname
+        served_chats = len(await get_served_chats())
         chat_id = message.chat.id
-        logger_id = get_logger_id()  # Fetch the logger ID
-        if logger_id:
-            ban_message = f"ʙᴏᴛ ʙᴀɴɴᴇᴅ ғʀᴏᴍ ɢʀᴏᴜᴘ..!😔\n\nɢʀᴏᴜᴘ ɴᴀᴍᴇ: {chatname}\nɢʀᴏᴜᴘ ɪᴅ: {chat_id}"
-            await lul_message(logger_id, ban_message)
+        if message.chat.username:
+            chatusername = f"@{message.chat.username}"
         else:
-            print("Logger ID not found. Please set the LOGGER_ID environment variable.")
+            chatusername = "ᴩʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
+        lemda_text = f"ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ..!🥳\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\nᴄʜᴀᴛ ɪᴅ: {chat_id}\nᴜsᴇʀɴᴀᴍᴇ: {chatusername}\nᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\nᴀᴅᴅᴇᴅ ʙʏ:{added_by}"
+        logger_id = get_logger_id()  # Fetch the logger ID
+        await lul_message(logger_id, lemda_text)
+
+@app.on_message(filters.left_chat_member)
+async def on_left_chat_member(client: Client, message: Message):
+    if message.left_chat_member.id == (await client.get_me()).id:
+        removed_by = message.from_user.first_name if message.from_user else "ᴜɴᴋɴᴏᴡɴ ᴜsᴇʀ"
+        chatname = message.chat.title  # Changed matlabi_jhanto to chatname
+        chat_id = message.chat.id
+        if message.chat.username:
+            chatusername = f"@{message.chat.username}"
+        else:
+            chatusername = "ᴩʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
+        lemda_text = f"ʙᴏᴛ ʀᴇᴍᴏᴠᴇᴅ ғʀᴏᴍ ɢʀᴏᴜᴘ..!😢\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\nᴄʜᴀᴛ ɪᴅ: {chat_id}\nᴜsᴇʀɴᴀᴍᴇ: {chatusername}\nʀᴇᴍᴏᴠᴇᴅ ʙʏ:{removed_by}"
+        logger_id = get_logger_id()  # Fetch the logger ID
+        await lul_message(logger_id, lemda_text)
 
 async def main():
     await app.start()
