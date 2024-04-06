@@ -1,7 +1,7 @@
 import os
 import asyncio
 from pyrogram import Client, filters
-from pyrogram.types import Chat
+from pyrogram.types import Chat, User
 from AdnanXMusic import app
 from AdnanXMusic.utils.database import get_served_chats
 
@@ -15,10 +15,10 @@ async def send_message_to_logger(chat_id: int, message: str):
     except Exception as e:
         print(f"Failed to send message to logger: {e}")
 
-@app.on_chat_kicked()
-async def on_bot_kicked_from_chat(client: Client, chat: Chat, by: Chat):
-    if chat.type in ("group", "supergroup") and by.id == (await client.get_me()).id:
-        removed_by = by.first_name if by else "Unknown User"
+@app.on_kicked()
+async def on_bot_kicked_from_chat(client: Client, chat: Chat, kicked_by: User):
+    if kicked_by.id == (await client.get_me()).id:
+        removed_by = kicked_by.first_name if kicked_by else "Unknown User"
         chatname = chat.title if chat.title else "Unnamed Chat"
         chat_id = chat.id
         if chat.username:
