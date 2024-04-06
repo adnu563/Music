@@ -93,8 +93,4 @@ async def song(_, message: Message):
 @app.on_message(filters.private & filters.command(["info"]))
 async def info(_, message: Message):
     await message.reply_text(
-        "This is a music bot. Just send me the name of the song you want to listen to, and I'll find it for you!"
-    )
-
-# Adding Song Title Information to the track
-LOGGER.info("Song Title Added ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ information mention")
+        "This is a music bot. Just send me the name of the song you want to listen to, and I'll find it for you!")
