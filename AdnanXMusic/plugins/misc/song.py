@@ -52,21 +52,28 @@ async def song(_, message: Message):
         
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
-            secmul *= 60
+            secmul *= 45
 
+      try:
         await app.send_audio(
             chat_id=message.chat.id,
             audio=audio_file,
             caption=rep,
             thumb=thumb_name,
             title=title,
-            duration=dur
+            duration=dur,
         )
-        await m.delete()
-
-        os.remove(audio_file)
-        os.remove(thumb_name)
-
     except Exception as e:
-        LOGGER.error(ex)
-        await m.edit_text("Failed to upload audio on Telegram servers.")
+        LOGGER.error(e)
+        return await m.edit_text(
+            text="Failed to upload audio on Telegram servers."
+        )
+    await m.delete()
+    except Exception as e:
+    LOGGER.error(ex)
+    return await m.edit_text("Failed to upload audio on Telegram servers.")
+try:
+    os.remove(audio_file)
+    os.remove(thumb_name)
+except Exception as ex:
+    LOGGER.error(ex)
