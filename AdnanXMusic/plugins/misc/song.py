@@ -97,4 +97,4 @@ async def info(_, message: Message):
     )
 
 # Adding Song Title Information to the track
-LOGGER().info("Song Title Added ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ information mention")
+LOGGER.info("Song Title Added ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ information mention")
