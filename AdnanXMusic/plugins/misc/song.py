@@ -46,7 +46,7 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
 
-        rep = f"»ᴛɪᴛʟᴇ: {title[:23]}\n»ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n»ᴛᴏᴛᴀʟ: {total_views}\n\n➻ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: (app.mention{bot_mention})"
+        rep = f"»ᴛɪᴛʟᴇ: {title[:23]}\n»ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n»ᴛᴏᴛᴀʟ: {total_views}\n\n➻ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}"
         secmul, dur = 1, 0
         dur_arr = duration.split(":")
         
