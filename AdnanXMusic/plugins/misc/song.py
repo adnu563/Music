@@ -69,7 +69,7 @@ async def song(_, message: Message):
         await app.send_audio(
             chat_id=message.chat.id,
             audio=audio_file,
-            caption=f"✍︎ ᴛɪᴛʟᴇ: {title[:23]}\n♲︎︎︎ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n⌨︎ ᴛᴏᴛᴀʟ: {total_views}\n\n♫︎ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
+            caption=f"♬ ᴛɪᴛʟᴇ: {title[:23]}\n➶ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➶ ᴛᴏᴛᴀʟ: {total_views}\n\n☇ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             thumb=thumb_name,
             title=title,
             duration=dur
