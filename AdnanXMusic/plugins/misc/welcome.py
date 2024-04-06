@@ -1,4 +1,5 @@
 import os
+import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from AdnanXMusic import app
@@ -18,7 +19,12 @@ async def on_new_chat_members(client: Client, message: Message):
             chatusername = f"@{message.chat.username}"
         else:
             chatusername = "ᴩʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
-        lemda_text = f"🌹 ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ ..\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {matlabi_jhanto}\nᴄʜᴀᴛ ɪᴅ: {chat_id}\n┣ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\nᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\nᴀᴅᴅᴇᴅ ʙʏ:{added_by}"
+        lemda_text = f"ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ..🥳\n\nᴄʜᴀᴛ ɴᴀᴍᴇ: {matlabi_jhanto}\nᴄʜᴀᴛ ɪᴅ: {chat_id}\n┣ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\nᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\nᴀᴅᴅᴇᴅ ʙʏ:{added_by}"
         await lul_message(123456789, lemda_text)  # Replace 123456789 with the desired group ID
 
-app.run()
+async def main():
+    await app.start()
+    await app.idle()
+
+if __name__ == "__main__":
+    asyncio.run(main())
