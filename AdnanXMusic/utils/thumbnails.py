@@ -99,4 +99,4 @@ async def get_thumb(videoid):
         return f"cache/{videoid}.png"
     except Exception as e:
         print(e)
-        return YOUTUBE_IMG_
+        return "path/to/default_image.png"  # Adjust this line to return the path to your default image
