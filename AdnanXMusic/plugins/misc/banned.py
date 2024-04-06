@@ -11,7 +11,7 @@ def get_logger_id():
 async def lul_message(chat_id: int, message: str):
     await app.send_message(chat_id=chat_id, text=message)
 
-@app.on_message(filters.chat_action("left"))
+@app.on_message(filters.chat_action("left") & filters.me)
 async def on_bot_removed(client: Client, message):
     chatname = message.chat.title
     served_chats = len(await get_served_chats())
