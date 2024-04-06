@@ -67,13 +67,13 @@ async def get_thumb(videoid):
         youtube = Image.open(f"cache/thumb{videoid}.png")
         image1 = changeImageSize(1280, 720, youtube)
         image2 = image1.convert("RGBA")
-        background = image2.filter(filter=ImageFilter.BoxBlur(6.5))
+        background = image2.filter(filter=ImageFilter.BoxBlur(5))
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.5)
         draw = ImageDraw.Draw(background)
         arial = ImageFont.truetype("AdnanXMusic/assets/font2.ttf", 30)
         font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
-        draw.text((1110, 08), unidecode(app.name), fill="white", font=arial)
+        draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
         draw.text(
             (55, 560),
             f"{channel} | {views[:23]}",
