@@ -12,7 +12,7 @@ def get_logger_id():
 async def lul_message(chat_id: int, message: str):
     await app.send_message(chat_id=chat_id, text=message)
 
-@app.on_message(filters.chat_action("left"))
+@app.on_message(filters.group & filters.left_chat_member)
 async def on_bot_kicked(client: Client, message: Message):
     if message.left_chat_member and message.left_chat_member.id == (await client.get_me()).id:
         chatname = message.chat.title  # Get the name of the chat
