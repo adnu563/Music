@@ -67,30 +67,49 @@ async def get_thumb(videoid):
         youtube = Image.open(f"cache/thumb{videoid}.png")
         image1 = changeImageSize(1280, 720, youtube)
         image2 = image1.convert("RGBA")
-        background = image2.filter(filter=ImageFilter.BoxBlur(10))
+        background = image2.filter(filter=ImageFilter.BoxBlur(7.5))
         enhancer = ImageEnhance.Brightness(background)
         background = enhancer.enhance(0.5)
         draw = ImageDraw.Draw(background)
         arial = ImageFont.truetype("AdnanXMusic/assets/font2.ttf", 30)
-        font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 28)
-        
-        # Your custom design starts here
-        # Top left side: app mention bot name
-        draw.text((20, 20), "YourBotName", fill="white", font=arial)
-        
-        # Footer middle: Channel name | Views
-        footer_text = f"{channel} | {views[:23]}"
-        draw.text((image1.width/2 - draw.textsize(footer_text, font=arial)[0]/2, 560), footer_text, fill="white", font=arial)
-        
-        # Body: Song name
-        song_name = clear(title)
-        draw.text((55, 600), song_name, fill="white", font=font)
-        
-        # Footer bottom: Symbol and duration
-        symbol_text = "02:38 ───────────●───── 03:23\n" \
-                      "          ⇆    ↻   ◁ 𝕀𝕀 ▷   ↺     ♡"
-        draw.text((55, 660), symbol_text, fill="white", font=font)
-        
+        font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
+        draw.text((1110, 20), unidecode(app.name), fill="white", font=arial)
+        draw.text(
+            (57, 600),
+            clear(title),
+            (255, 255, 255),
+            font=font,
+        )
+        draw.line(
+            [(55, 660), (720, 660)],
+            fill="white",
+            width=10,
+            joint="curve",
+        )
+        draw.text(
+            (455, 560),
+            f"{channel} | {views[:23]}",
+            (255, 255, 255),
+            font=arial,
+        )
+        draw.ellipse(
+            [(918, 648), (942, 672)],
+            outline="white",
+            fill="white",
+            width=15,
+        )
+        draw.text(
+            (36, 685),
+            "00:00",
+            (255, 255, 255),
+            font=arial,
+        )
+        draw.text(
+            (1185, 685),
+            f"{duration[:23]}",
+            (255, 255, 255),
+            font=arial,
+        )
         try:
             os.remove(f"cache/thumb{videoid}.png")
         except:
@@ -99,4 +118,4 @@ async def get_thumb(videoid):
         return f"cache/{videoid}.png"
     except Exception as e:
         print(e)
-        return "path/to/default_image.png"  # Adjust this line to return the path to your default image
+        return YOUTUBE_IMG_URL
