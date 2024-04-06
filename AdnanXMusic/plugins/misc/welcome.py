@@ -1,11 +1,10 @@
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from AdnanXMusic import app  # Assuming `app` is the Flask app instance
-from AdnanXMusic.logging import logger
-from pyrogram import Client
+# from AdnanXMusic.logging import logger  # Removed import statement
 
 # Function to handle new chat members
-def new_chat_members(client: Client, message: Message):
+def new_chat_members(client, message):
     # Get information about the chat
     chat = message.chat
     chat_info = f"Chat ID: {chat.id}\nChat Title: {chat.title}"
