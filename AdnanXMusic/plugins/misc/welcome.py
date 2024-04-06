@@ -15,7 +15,7 @@ async def lul_message(chat_id: int, message: str):
 @app.on_message(filters.new_chat_members)
 async def on_new_chat_members(client: Client, message: Message):
     if (await client.get_me()).id in [user.id for user in message.new_chat_members]:
-        added_by = message.from_user.first_name if message.from_user else "ᴜɴᴋɴᴏᴡɴ ᴜsᴇʀ"
+        added_by_mention = message.from_user.mention if message.from_user else "ᴜɴᴋɴᴏᴡɴ ᴜsᴇʀ"
         chatname = message.chat.title  # Changed matlabi_jhanto to chatname
         served_chats = len(await get_served_chats())
         chat_id = message.chat.id
@@ -23,7 +23,7 @@ async def on_new_chat_members(client: Client, message: Message):
             chatusername = f"@{message.chat.username}"
         else:
             chatusername = "ᴩʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ"
-        lemda_text = f"➻ ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ! 🥳\n\n‣ ᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\n‣ ᴄʜᴀᴛ ɪᴅ: {chat_id}\n‣ ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\n‣ ᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\n‣ ᴀᴅᴅᴇᴅ ʙʏ:{added_by}"
+        lemda_text = f"➻ ʙᴏᴛ ᴀᴅᴅᴇᴅ ᴛᴏ ɴᴇᴡ ɢʀᴏᴜᴘ! 🥳\n\n‣ ᴄʜᴀᴛ ɴᴀᴍᴇ: {chatname}\n‣ ᴄʜᴀᴛ ɪᴅ: {chat_id}\n‣ ᴜsᴇʀɴᴀᴍᴇ: {chatusername}\n‣ ᴛᴏᴛᴀʟ ᴄʜᴀᴛ: {served_chats}\n‣ ᴀᴅᴅᴇᴅ ʙʏ:{added_by_mention}"
         logger_id = get_logger_id()  # Fetch the logger ID
         await lul_message(logger_id, lemda_text)
 
