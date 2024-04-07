@@ -100,4 +100,5 @@ async def song_info_callback(_, callback_query):
         LOGGER.error(e)
         await callback_query.answer(text="Failed to fetch song information.")
 
-app.run()
+if __name__ == "__main__":
+    asyncio.run(app.run())
