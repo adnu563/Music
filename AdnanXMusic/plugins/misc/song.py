@@ -87,7 +87,7 @@ async def song(_, message: Message):
         os.remove(thumb_name)
 
     except Exception as e:
-        LOGGER.error(e)
+        LOGGER.error(ex)
         await m.edit_text("Failed to upload audio on Telegram servers.")
 
 @app.on_callback_query(filters.regex(r"song_info_"))
