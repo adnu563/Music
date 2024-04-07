@@ -34,7 +34,7 @@ async def song(_, message: Message):
     try:
         results = YoutubeSearch(query, max_results=5).to_dict()
         link = f"https://youtube.com{results[0]['url_suffix']}"
-        title = f"Song Tracker: {results[0]['title'][:40]}"
+        title = results[0]["title"][:40]
         thumbnail = results[0]["thumbnails"][0]
         thumb_name = f"thumb{title}.jpg"
 
@@ -69,11 +69,10 @@ async def song(_, message: Message):
         await app.send_audio(
             chat_id=message.chat.id,
             audio=audio_file,
-            caption=f"🎙 ᴛɪᴛʟᴇ: {results[0]['title'][:23]}\n💿 ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➥ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
+            caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             thumb=thumb_name,
             title=title,
-            duration=dur,
-            performer="AdnanXMusic"
+            duration=dur
         )
         await m.delete()
 
