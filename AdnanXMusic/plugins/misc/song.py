@@ -24,7 +24,7 @@ async def song(_, message: Message):
     try:
         await message.delete()
     except Exception as e:
-        LOGGER.error(e)
+        LOGGER.error(str(e))
 
     m = await message.reply_text("🔍")
 
@@ -45,7 +45,7 @@ async def song(_, message: Message):
         total_views = results[0]["views"]
         uploader = results[0]["channel"]
     except Exception as ex:
-        LOGGER.error(ex)
+        LOGGER.error(str(ex))
         return await m.edit_text(
             f"Failed to fetch track from YT-DL.\n\nReason: {ex}"
         )
@@ -87,7 +87,7 @@ async def song(_, message: Message):
         os.remove(thumb_name)
 
     except Exception as e:
-        LOGGER.error(e)
+        LOGGER.error(str(e))
         await m.edit_text("Failed to upload audio on Telegram servers.")
 
 @app.on_callback_query(filters.regex(r"song_info_"))
@@ -97,7 +97,7 @@ async def song_info_callback(_, callback_query):
         # Retrieve and send song information here using audio_file
         await callback_query.answer(text="Fetching song information...")
     except Exception as e:
-        LOGGER.error(e)
+        LOGGER.error(str(e))
         await callback_query.answer(text="Failed to fetch song information.")
 
 if __name__ == "__main__":
