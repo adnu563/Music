@@ -101,4 +101,4 @@ async def song_info_callback(_, callback_query):
         await callback_query.answer(text="Failed to fetch song information.")
 
 if __name__ == "__main__":
-    asyncio.run(app.run())
+    app.run()
