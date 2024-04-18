@@ -8,6 +8,7 @@ from AdnanXMusic import app
 from AdnanXMusic.logging import LOGGER
 
 BOT_MENTION = "AdnanXMusic"
+BOT_USERNAME = "your_bot_username"  # Update with your bot's username
 
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
@@ -67,9 +68,11 @@ async def song(_, message: Message):
                 reply_markup=visit_butt,
             )
             await m.delete()  # Delete the message indicating that the song is being downloaded
-        except:
+        except Exception as e:
+            LOGGER.error(e)
             return await m.edit_text("Failed to send audio.")
-    except:
+    except Exception as e:
+        LOGGER.error(e)
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     try:
