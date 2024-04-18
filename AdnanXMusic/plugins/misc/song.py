@@ -6,7 +6,15 @@ from youtube_search import YoutubeSearch
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from AdnanXMusic import app
-from AdnanXMusic.logging import LOGGER
+import logging
+
+# Initialize logger
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+LOGGER.addHandler(stream_handler)
 
 async def download_file(url, filename):
     async with aiohttp.ClientSession() as session:
