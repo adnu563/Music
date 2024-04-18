@@ -13,7 +13,7 @@ API_HASH = getenv("API_HASH")
 # Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
-OPENAI_KEY = getenv("OPENAI_KEY")
+OPENAI_KEY = getenv("sk-proj-OOu4r9pkNcQVoPaie97iT3BlbkFJdgPaWK4gyGUurUQHo4mh")
 
 # Get your mongo url from cloud.mongodb.com
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
