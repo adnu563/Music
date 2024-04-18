@@ -36,5 +36,5 @@ def chat(messagge):
         bot.reply_to(message,e)
 
 
-print("Bot Started....)
+print("Bot Started....")
 bot.polling()
