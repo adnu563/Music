@@ -67,14 +67,22 @@ async def song(_, message: Message):
             minutes, seconds = map(int, duration_parts)
             total_seconds = minutes * 60 + seconds
 
-        # Send audio with thumbnail
+        # Send thumbnail as a separate message
+        thumb_message = await app.send_photo(
+            chat_id=message.chat.id,
+            photo=thumb_name,
+            caption=f"Thumbnail for: {title}",
+        )
+
+        # Send audio with the thumbnail message ID
         await app.send_audio(
             chat_id=message.chat.id,
             audio=audio_file,
             caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             thumb=thumb_name,
             title=title,
-            duration=total_seconds
+            duration=total_seconds,
+            reply_to_message_id=thumb_message.message_id
         )
         await m.delete()
 
