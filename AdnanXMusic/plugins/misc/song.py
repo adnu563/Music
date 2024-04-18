@@ -34,7 +34,7 @@ async def song(_, message: Message):
     try:
         results = YoutubeSearch(query, max_results=5).to_dict()
         link = f"https://youtube.com{results[0]['url_suffix']}"
-        title = results[0]["title"][:40]
+        title = results[0]["title"][:20]
         thumbnail = results[0]["thumbnails"][0]
         thumb_name = f"thumb{title}.jpg"
 
@@ -59,11 +59,13 @@ async def song(_, message: Message):
             ydl.process_info(info_dict)
 
         # Calculate duration
-        secmul, dur = 1, 0
-        dur_arr = duration.split(":")
-        for i in range(len(dur_arr) - 1, -1, -1):
-            dur += int(dur_arr[i]) * secmul
-            secmul *= 45
+        duration_parts = duration.split(":")
+        if len(duration_parts) == 3:
+            hours, minutes, seconds = map(int, duration_parts)
+            total_seconds = hours * 3600 + minutes * 60 + seconds
+        else:
+            minutes, seconds = map(int, duration_parts)
+            total_seconds = minutes * 60 + seconds
 
         # Send audio with thumbnail
         await app.send_audio(
@@ -72,7 +74,7 @@ async def song(_, message: Message):
             caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             thumb=thumb_name,
             title=title,
-            duration=dur
+            duration=total_seconds
         )
         await m.delete()
 
