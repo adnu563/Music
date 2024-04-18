@@ -44,6 +44,11 @@ async def song(_, message: Message):
         link = f"https://youtube.com{results[0]['url_suffix']}"
         title = results[0]["title"][:40]
         thumbnail = results[0]["thumbnails"][0]
+        thumb_name = f"thumb{title}.jpg"
+
+        # Download thumbnail asynchronously
+        await download_file(thumbnail, thumb_name)
+
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
@@ -68,18 +73,16 @@ async def song(_, message: Message):
             minutes, seconds = map(int, duration_parts)
             total_seconds = minutes * 60 + seconds
 
-        # Send audio without the thumbnail
-        await message.reply_audio(
+        # Send audio with the thumbnail as the play thumbnail
+        await app.send_audio(
+            chat_id=message.chat.id,
             audio=audio_file,
             caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             title=title,
-            duration=total_seconds
+            duration=total_seconds,
+            thumb=thumb_name,
+            reply_to_message_id=message.message_id
         )
         await m.delete()
 
-        # Remove temporary files
-        os.remove(audio_file)
-
-    except Exception as e:
-        LOGGER.error(e)
-        await m.edit_text(f"Failed to upload audio on Telegram servers. Error: {e}")
+        # Remove tempor
