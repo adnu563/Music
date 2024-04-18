@@ -8,7 +8,6 @@ from AdnanXMusic import app
 from AdnanXMusic.logging import LOGGER
 
 BOT_MENTION = "AdnanXMusic"
-BOT_USERNAME = "your_bot_username"  # Update with your bot's username
 
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
