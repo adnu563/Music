@@ -4,9 +4,10 @@ import yt_dlp
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
+from AdnanXMusic import app
+from AdnanXMusic.logging import LOGGER
 
-from AdnanXMusic import BOT_USERNAME, LOGGER, app
-
+BOT_MENTION = AdnanXMusic
 
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
