@@ -18,7 +18,7 @@ def chatmodal(prompt):
                     presence_penalty=0
                     )
     print(response)
-    chatStr += f={response['choices'][0]['text']}"
+    chatStr += f="{response['choices'][0]['text']}"
     return response['choices'][0]['text']
 bot = telebot.TeleBot(BOT_API)
 
