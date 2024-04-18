@@ -6,15 +6,7 @@ from youtube_search import YoutubeSearch
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from AdnanXMusic import app
-import logging
-
-# Initialize logger
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.ERROR)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(formatter)
-LOGGER.addHandler(stream_handler)
+from AdnanXMusic.logging import LOGGER
 
 async def download_file(url, filename):
     async with aiohttp.ClientSession() as session:
@@ -82,8 +74,9 @@ async def song(_, message: Message):
             caption=f"Thumbnail for: {title}",
         )
 
-        # Send audio with the thumbnail message ID and song file as attachment
-        await message.reply_audio(
+        # Send audio with the thumbnail message ID
+        await app.send_audio(
+            chat_id=message.chat.id,
             audio=audio_file,
             caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             thumb=thumb_name,
@@ -99,4 +92,4 @@ async def song(_, message: Message):
 
     except Exception as e:
         LOGGER.error(e)
-        await m.edit_text(f"Failed to upload audio on Telegram servers. Error: {e}")
+        await m.edit_text("Failed to upload audio on Telegram servers.")
