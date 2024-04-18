@@ -4,9 +4,17 @@ import asyncio
 import yt_dlp
 from youtube_search import YoutubeSearch
 from pyrogram import filters
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import Message
 from AdnanXMusic import app
-from AdnanXMusic.logging import LOGGER
+import logging
+
+# Initialize logger
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+LOGGER.addHandler(stream_handler)
 
 async def download_file(url, filename):
     async with aiohttp.ClientSession() as session:
@@ -36,14 +44,6 @@ async def song(_, message: Message):
         link = f"https://youtube.com{results[0]['url_suffix']}"
         title = results[0]["title"][:40]
         thumbnail = results[0]["thumbnails"][0]
-        thumb_name = f"thumb{title}.jpg"
-
-        # Download thumbnail asynchronously
-        await download_file(thumbnail, thumb_name)
-
-        duration = results[0]["duration"]
-        total_views = results[0]["views"]
-        uploader = results[0]["channel"]
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
@@ -59,6 +59,7 @@ async def song(_, message: Message):
             ydl.process_info(info_dict)
 
         # Calculate duration
+        duration = results[0]["duration"]
         duration_parts = duration.split(":")
         if len(duration_parts) == 3:
             hours, minutes, seconds = map(int, duration_parts)
@@ -67,29 +68,18 @@ async def song(_, message: Message):
             minutes, seconds = map(int, duration_parts)
             total_seconds = minutes * 60 + seconds
 
-        # Send thumbnail as a separate message
-        thumb_message = await app.send_photo(
-            chat_id=message.chat.id,
-            photo=thumb_name,
-            caption=f"Thumbnail for: {title}",
-        )
-
-        # Send audio with the thumbnail message ID
-        await app.send_audio(
-            chat_id=message.chat.id,
+        # Send audio without the thumbnail
+        await message.reply_audio(
             audio=audio_file,
-            caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
-            thumb=thumb_name,
+            caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             title=title,
-            duration=total_seconds,
-            reply_to_message_id=thumb_message.message_id
+            duration=total_seconds
         )
         await m.delete()
 
         # Remove temporary files
         os.remove(audio_file)
-        os.remove(thumb_name)
 
     except Exception as e:
         LOGGER.error(e)
-        await m.edit_text("Failed to upload audio on Telegram servers.")
+        await m.edit_text(f"Failed to upload audio on Telegram servers. Error: {e}")
