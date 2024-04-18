@@ -82,9 +82,8 @@ async def song(_, message: Message):
             caption=f"Thumbnail for: {title}",
         )
 
-        # Send audio with the thumbnail message ID
-        await app.send_audio(
-            chat_id=message.chat.id,
+        # Send audio with the thumbnail message ID and song file as attachment
+        await message.reply_audio(
             audio=audio_file,
             caption=f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}",
             thumb=thumb_name,
@@ -100,4 +99,4 @@ async def song(_, message: Message):
 
     except Exception as e:
         LOGGER.error(e)
-        await m.edit_text("Failed to upload audio on Telegram servers.")
+        await m.edit_text(f"Failed to upload audio on Telegram servers. Error: {e}")
