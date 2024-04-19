@@ -27,3 +27,4 @@ python-telegram-bot
 pyTelegramBotAPI
 openai
 telebot
+beautifulsoup4
