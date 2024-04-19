@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 
 BOT_MENTION = "AdnanXMusic"
 
-@app.on_message(filters.command(["vsong", "video"]))
+@app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
         await message.delete()
@@ -25,7 +25,7 @@ async def song(_, message: Message):
 
     command = message.command[0].lower()
 
-    if command == "video":
+    if command == "vsong":
         try:
             query = " ".join(message.command[1:])
             results = YoutubeSearch(query, max_results=5).to_dict()
@@ -50,7 +50,7 @@ async def song(_, message: Message):
                 video_file = ydl.prepare_filename(info_dict)
 
             bot_username = (await app.get_me()).username
-            rep = f"➠ Title: {title[:23]}\n➠ Duration: {duration}\n➠ Total Views: {total_views}\n\n➥ Uploaded by: @{bot_username}"
+            rep = f"➠ Title: {title[:23]}\n\n➥ Uploaded by: @{bot_username}"
             try:
                 await app.send_video(
                     chat_id=message.chat.id,
