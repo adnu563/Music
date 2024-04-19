@@ -1,5 +1,6 @@
 import os
 import requests
+import yt_dlp
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
@@ -43,8 +44,10 @@ async def song(_, message: Message):
 
         await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
         try:
-            video_data = requests.get(link)
-            open(video_file, "wb").write(video_data.content)
+            ydl_opts = {"format": "best"}
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(link, download=True)
+                video_file = ydl.prepare_filename(info_dict)
 
             bot_username = (await app.get_me()).username
             rep = f"➠ Title: {title[:23]}\n\n➥ Uploaded by: @{bot_username}"
