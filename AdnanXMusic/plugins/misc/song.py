@@ -67,8 +67,8 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        bot_username = (await app.get_me()).username
-        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
+        uploader_user = message.from_user.mention  # Mention the user who uploaded the song
+        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {uploader_user}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
@@ -81,6 +81,7 @@ async def song(_, message: Message):
                 thumb=thumb_name,
                 title=title,
                 duration=dur,
+                mention=message.from_user.id  # Mention the user who uploaded the song
             )
             await m.delete()  # Delete the message indicating that the song is being downloaded
         except Exception as e:
