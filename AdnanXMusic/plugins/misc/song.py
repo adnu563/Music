@@ -2,7 +2,7 @@ import os
 import requests
 import yt_dlp
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from pyrogram.types import Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 import logging
@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 # Configure the LOGGER object
 logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
 
-BOT_USERNAME = "AdnanXMusic"  # Replace "AdnanXMusic" with your bot username
+BOT_USERNAME = "AdnanXMusic"
 
 def shorten_views(views):
     try:
@@ -71,8 +71,8 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         bot_mention = f"@{BOT_USERNAME}"  # Mention the bot username
-        app_mention = f"[{app.ME.first_name}](https://t.me/{BOT_USERNAME})"  # Mention the app
-        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n\nUploaded by: {app_mention} in chat with {bot_mention}"
+        app_mention = f"[{BOT_USERNAME}](https://t.me/{BOT_USERNAME})"  # Mention the app
+        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n\nUploaded by: {app_mention}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
