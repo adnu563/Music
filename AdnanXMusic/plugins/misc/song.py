@@ -71,7 +71,7 @@ async def song(_, message: Message):
             LOGGER.error(e)
             return await m.edit_text("Failed to send audio.")
     except Exception as e:
-        LOGGER.error(e)
+        LOGGER.error(ex)
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     try:
