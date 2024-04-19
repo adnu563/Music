@@ -74,7 +74,7 @@ async def song(_, message: Message):
         if message.chat.username:
             chatusername = f"@{message.chat.username}"
         else:
-        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n\nUploaded by {bot_mention}"
+            rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n\nUploaded by {bot_mention}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
