@@ -55,7 +55,7 @@ async def song(_, message: Message):
                 video_file = info_dict.get('filename')
 
                 if not video_file:
-                    raise Exception("Failed to download video")
+                    raise Exception("Failed to download video: No video file found")
 
             bot_username = (await app.get_me()).username
             rep = f"➠ Title: {title[:23]}\n➠ Duration: {duration}\n➠ Total Views: {total_views}\n\n➥ Uploaded by: @{bot_username}"
