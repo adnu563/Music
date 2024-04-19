@@ -50,55 +50,56 @@ async def song(_, message: Message):
     command = message.command[0].lower()
 
     if command == "video":
+    try:
+        query = " ".join(message.command[1:])
+        results = YoutubeSearch(query, max_results=5).to_dict()
+        link = f"https://youtube.com{results[0]['url_suffix']}"
+        title = results[0]["title"][:40]
+        thumbnail = results[0]["thumbnails"][0]
+        thumb_name = f"thumb{title}.jpg"
+        video_file = f"{title}.mp4"
+        thumb_data = requests.get(thumbnail, allow_redirects=True)
+        open(thumb_name, "wb").write(thumb_data.content)
+        singer = results[0]["channel"]
+    except Exception as ex:
+        LOGGER.error(ex)
+        return await m.edit_text(
+            f"<b>Failed to fetch track from YouTube.\n●ʀᴇᴀsᴏɴ:</b> {ex}"
+        )
+
+    await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
+    try:
+        ydl_opts = {"format": "best"}
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=True)
+            video_file = ydl.prepare_filename(info_dict)
+            duration_seconds = info_dict.get('duration', '')
+            duration_formatted = format_duration(duration_seconds)
+
+        total_views = info_dict.get('view_count', '')
+        total_views_short = shorten_views(total_views)
+
+        bot_username = (await app.get_me()).username
+        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ꜱɪɴɢᴇʀ: {singer}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
         try:
-            query = " ".join(message.command[1:])
-            results = YoutubeSearch(query, max_results=5).to_dict()
-            link = f"https://youtube.com{results[0]['url_suffix']}"
-            title = results[0]["title"][:40]
-            thumbnail = results[0]["thumbnails"][0]
-            thumb_name = f"thumb{title}.jpg"
-            video_file = f"{title}.mp4"
-            thumb_data = requests.get(thumbnail, allow_redirects=True)
-            open(thumb_name, "wb").write(thumb_data.content)
-        except Exception as ex:
-            LOGGER.error(ex)
-            return await m.edit_text(
-                f"<b>Failed to fetch track from YouTube.\n●ʀᴇᴀsᴏɴ:</b> {ex}"
+            await app.send_video(
+                chat_id=message.chat.id,
+                video=video_file,
+                caption=rep,
+                thumb=thumb_name
             )
-
-        await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
-        try:
-            ydl_opts = {"format": "best"}
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info_dict = ydl.extract_info(link, download=True)
-                video_file = ydl.prepare_filename(info_dict)
-                duration_seconds = info_dict.get('duration', '')
-                duration_formatted = format_duration(duration_seconds)
-
-            total_views = info_dict.get('view_count', '')
-            total_views_short = shorten_views(total_views)
-
-            bot_username = (await app.get_me()).username
-            rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ꜱɪɴɢᴇʀ: {singer}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
-            try:
-                await app.send_video(
-                    chat_id=message.chat.id,
-                    video=video_file,
-                    caption=rep,
-                    thumb=thumb_name
-                )
-                await m.delete()  # Delete the message indicating that the video is being downloaded
-            except Exception as e:
-                LOGGER.error(e)
-                return await m.edit_text("Failed to send video.")
+            await m.delete()  # Delete the message indicating that the video is being downloaded
         except Exception as e:
             LOGGER.error(e)
-            return await m.edit_text("Failed to download and upload video.")
+            return await m.edit_text("Failed to send video.")
+    except Exception as e:
+        LOGGER.error(e)
+        return await m.edit_text("Failed to download and upload video.")
 
-        try:
-            if os.path.exists(video_file):
-                os.remove(video_file)
-            if os.path.exists(thumb_name):
-                os.remove(thumb_name)
-        except Exception as ex:
-            LOGGER.error(ex)
+    try:
+        if os.path.exists(video_file):
+            os.remove(video_file)
+        if os.path.exists(thumb_name):
+            os.remove(thumb_name)
+    except Exception as ex:
+        LOGGER.error(ex)
