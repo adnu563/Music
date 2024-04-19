@@ -2,7 +2,7 @@ import os
 import requests
 import yt_dlp
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 import logging
@@ -67,8 +67,8 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        uploader_user = message.from_user.mention  # Mention the user who uploaded the song
-        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {uploader_user}"
+        bot_mention = f"@{BOT_MENTION}"  # Mention the bot itself
+        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {bot_mention}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
@@ -99,3 +99,9 @@ async def song(_, message: Message):
         os.remove(thumb_name)
     except Exception as ex:
         LOGGER.error(ex)
+
+@app.on_callback_query(filters.regex("track_details"))
+async def track_details_callback(_, query: CallbackQuery):
+    # Here you can define the action to be performed when the "Track Details" button is clicked
+    await query.answer()
+    await query.message.reply_text("Here are the track details...")
