@@ -53,6 +53,7 @@ async def song(_, message: Message):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
                 video_file = info_dict.get('filename')
+
                 if not video_file:
                     raise Exception("Failed to download video")
 
