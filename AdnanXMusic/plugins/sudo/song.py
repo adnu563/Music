@@ -8,7 +8,7 @@ from AdnanXMusic import app
 import logging
 
 # Initialize the LOGGER object
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(name)
 
 # Configure the LOGGER object
 logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
@@ -54,7 +54,7 @@ async def song(_, message: Message):
         except Exception as ex:
             LOGGER.error(ex)
             return await m.edit_text(
-                f"Failed to fetch video from YouTube.\n\n**Reason:** `{ex}`"
+                f"Failed to fetch video from YouTube.\n\n**Reason:** {ex}"
             )
 
         await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
@@ -63,8 +63,7 @@ async def song(_, message: Message):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
                 video_file = ydl.prepare_filename(info_dict)
-                duration_seconds = info_dict.get('duration', 0)
-                duration = f"{duration_seconds // 60}:{duration_seconds % 60:02d}"
+                duration = info_dict.get('duration', '')
 
             total_views = info_dict.get('view_count', '')
             total_views_short = shorten_views(total_views)
@@ -93,6 +92,3 @@ async def song(_, message: Message):
                 os.remove(thumb_name)
         except Exception as ex:
             LOGGER.error(ex)
-
-# Run the app
-app.run()
