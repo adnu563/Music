@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 # Configure the LOGGER object
 logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
 
-BOT_USERNAME = "AdnanXMusic"  # Replace "AdnanXMusic" with your bot username
+BOT_USERNAME = "AdnanXMusic"
 
 def shorten_views(views):
     try:
@@ -71,15 +71,12 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         bot_mention = f"@{BOT_USERNAME}"  # Mention the bot username
-        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ᴛʜᴜᴍʙɴᴀɪʟ: {thumbnail}\n➠ ꜱɪɴɢᴇʀ: {singer}"
+        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {app.mention}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
             secmul *= 60
         try:
-            keyboard = InlineKeyboardMarkup(
-                [[InlineKeyboardButton("Track Details", callback_data="track_details")]]
-            )
             await app.send_audio(
                 chat_id=message.chat.id,  # Send the song in the same chat where the command was called
                 audio=audio_file,
@@ -87,7 +84,6 @@ async def song(_, message: Message):
                 thumb=thumb_name,
                 title=title,
                 duration=dur,
-                reply_markup=keyboard
             )
             await m.delete()  # Delete the message indicating that the song is being downloaded
         except Exception as e:
@@ -100,19 +96,4 @@ async def song(_, message: Message):
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
-    except Exception as ex:
-        LOGGER.error(ex)
-
-@app.on_callback_query(filters.regex("track_details"))
-async def track_details_callback(_, query: CallbackQuery):
-    message = query.message
-    song_name = message.caption.split("\n")[0].split(":")[1].strip()  # Extract song name from caption
-    thumbnail = message.caption.split("\n")[3].split(":")[1].strip()  # Extract thumbnail URL from caption
-    singer = message.caption.split("\n")[4].split(":")[1].strip()  # Extract singer name from caption
-    duration = message.caption.split("\n")[1].split(":")[1].strip()  # Extract duration from caption
-    total_views = message.caption.split("\n")[2].split(":")[1].strip()  # Extract total views from caption
-    
-    response = f"🎵 **Track Details** 🎵\n\n**Song Name:** {song_name}\n**Singer:** {singer}\n**Duration:** {duration}\n**Total Views:** {total_views}"
-    
-    await query.answer()
-    await query.message.reply_photo(thumbnail, response)
+    except
