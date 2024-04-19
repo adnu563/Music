@@ -1,8 +1,8 @@
 import os
+import requests
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
-from pytube import YouTube
 from AdnanXMusic import app
 import logging
 
@@ -43,8 +43,8 @@ async def song(_, message: Message):
 
         await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
         try:
-            yt = YouTube(link)
-            yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download(filename=video_file)
+            video_data = requests.get(link)
+            open(video_file, "wb").write(video_data.content)
 
             bot_username = (await app.get_me()).username
             rep = f"➠ Title: {title[:23]}\n\n➥ Uploaded by: @{bot_username}"
