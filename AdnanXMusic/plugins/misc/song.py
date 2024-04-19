@@ -30,7 +30,7 @@ async def song(_, message: Message):
         duration = results[0]["duration"]
 
     except Exception as ex:
-        LOGGER.exception(ex)
+        LOGGER.error(ex)
         return await m.edit_text(
             f"Failed to fetch track from YouTube.\n\n**Reason:** `{ex}`"
         )
@@ -68,14 +68,14 @@ async def song(_, message: Message):
             )
             await m.delete()  # Delete the message indicating that the song is being downloaded
         except Exception as e:
-            LOGGER.exception(e)
+            LOGGER.error(e)
             return await m.edit_text("Failed to send audio.")
     except Exception as e:
-        LOGGER.exception(e)
+        LOGGER.error(e)
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
     except Exception as ex:
-        LOGGER.exception(ex)
+        LOGGER.error(ex)
