@@ -71,7 +71,8 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         bot_mention = f"@{BOT_USERNAME}"  # Mention the bot username
-        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}"
+        app_mention = f"[{app.ME.first_name}](https://t.me/{BOT_USERNAME})"  # Mention the app
+        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n\nUploaded by: {app_mention} in chat with {bot_mention}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
