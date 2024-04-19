@@ -11,13 +11,13 @@ API_ID = int(getenv("API_ID"))
 API_HASH = getenv("API_HASH")
 
 # Get your token from @BotFather on Telegram.
-BOT_TOKEN = getenv("BOT_TOKEN")
+BOT_TOKEN = getenv("7091541433:AAHHwt431VqrI3jkYPaEMDmCxZ9PFTvs5f8")
 
 # Get your token from @BotFather on Telegram.
 BOT_API = "7091541433:AAHHwt431VqrI3jkYPaEMDmCxZ9PFTvs5f8"
 
 # get your openai key from chatgpt.
-OPENAI_KEY = getenv("OPENAI_KEY")
+OPENAI_KEY = "sk-proj-JlDhDQtYrdiO2hd0PEHQT3BlbkFJ3K8JWd0lU6EnX6VkVDeo"
 
 # Get your mongo url from cloud.mongodb.com
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
