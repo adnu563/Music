@@ -6,7 +6,6 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 import logging
-from bs4 import BeautifulSoup
 
 # Initialize the LOGGER object
 LOGGER = logging.getLogger(__name__)
@@ -61,14 +60,7 @@ async def song(_, message: Message):
             video_file = f"{title}.mp4"
             thumb_data = requests.get(thumbnail, allow_redirects=True)
             open(thumb_name, "wb").write(thumb_data.content)
-            channel_name = results[0]["channel"]
-
-            # Extract singer from video description
-            description_response = requests.get(link)
-            soup = BeautifulSoup(description_response.text, 'html.parser')
-            description = soup.find('yt-formatted-string', class_='content').text
-            singer = " ".join(description.split("by")[-1].split()[:2])  # Assuming singer name comes after 'by'
-
+            singer = results[0]["channel"]
         except Exception as ex:
             LOGGER.error(ex)
             return await m.edit_text(
@@ -88,7 +80,7 @@ async def song(_, message: Message):
             total_views_short = shorten_views(total_views)
 
             bot_username = (await app.get_me()).username
-            rep = f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴄʜᴀɴɴᴇʟ: {channel_name}\n➠ ꜱɪɴɢᴇʀ: {singer}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
+            rep = f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ꜱɪɴɢᴇʀ: {singer}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
             try:
                 await app.send_video(
                     chat_id=message.chat.id,
@@ -111,3 +103,5 @@ async def song(_, message: Message):
                 os.remove(thumb_name)
         except Exception as ex:
             LOGGER.error(ex)
+
+Added Youtube Channel Name and Singer Name Problem kindly fix it
