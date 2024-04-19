@@ -13,6 +13,9 @@ API_HASH = getenv("API_HASH")
 # Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
+# Get your token from @BotFather on Telegram.
+BOT_API = "7091541433:AAHHwt431VqrI3jkYPaEMDmCxZ9PFTvs5f8"
+
 # get your openai key from chatgpt.
 OPENAI_KEY = getenv("OPENAI_KEY")
 
