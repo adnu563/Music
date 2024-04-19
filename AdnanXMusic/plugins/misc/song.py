@@ -5,7 +5,13 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
-from AdnanXMusic.logging import LOGGER
+import logging
+
+# Initialize the LOGGER object
+LOGGER = logging.getLogger(__name__)
+
+# Configure the LOGGER object
+logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
 
 BOT_MENTION = "AdnanXMusic"
 
@@ -71,7 +77,7 @@ async def song(_, message: Message):
             LOGGER.error(e)
             return await m.edit_text("Failed to send audio.")
     except Exception as e:
-        LOGGER.error(ex)
+        LOGGER.error(e)
         return await m.edit_text("Failed to upload audio on Telegram servers.")
 
     try:
