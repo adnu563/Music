@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 # Configure the LOGGER object
 logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
 
-BOT_MENTION = "AdnanXMusic"
+BOT_USERNAME = "AdnanXMusic"  # Replace "AdnanXMusic" with your bot username
 
 def shorten_views(views):
     try:
@@ -49,6 +49,9 @@ async def song(_, message: Message):
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, "wb").write(thumb.content)
         duration = results[0]["duration"]
+        singer = results[0]["channel"]
+        song_name = results[0]["title"]
+        views = results[0]["views"]
 
         # Fetch total views using yt_dlp
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -67,8 +70,8 @@ async def song(_, message: Message):
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
-        bot_mention = f"@{BOT_MENTION}"  # Mention the bot itself
-        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: {bot_mention}"
+        bot_mention = f"@{BOT_USERNAME}"  # Mention the bot username
+        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ᴛʜᴜᴍʙɴᴀɪʟ: {thumbnail}\n➠ ꜱɪɴɢᴇʀ: {singer}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
@@ -102,6 +105,14 @@ async def song(_, message: Message):
 
 @app.on_callback_query(filters.regex("track_details"))
 async def track_details_callback(_, query: CallbackQuery):
-    # Here you can define the action to be performed when the "Track Details" button is clicked
+    message = query.message
+    song_name = message.caption.split("\n")[0].split(":")[1].strip()  # Extract song name from caption
+    thumbnail = message.caption.split("\n")[3].split(":")[1].strip()  # Extract thumbnail URL from caption
+    singer = message.caption.split("\n")[4].split(":")[1].strip()  # Extract singer name from caption
+    duration = message.caption.split("\n")[1].split(":")[1].strip()  # Extract duration from caption
+    total_views = message.caption.split("\n")[2].split(":")[1].strip()  # Extract total views from caption
+    
+    response = f"🎵 **Track Details** 🎵\n\n**Song Name:** {song_name}\n**Singer:** {singer}\n**Duration:** {duration}\n**Total Views:** {total_views}"
+    
     await query.answer()
-    await query.message.reply_text("Here are the track details...")
+    await query.message.reply_photo(thumbnail, response)
