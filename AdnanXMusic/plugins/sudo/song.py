@@ -63,7 +63,7 @@ async def song(_, message: Message):
         except Exception as ex:
             LOGGER.error(ex)
             return await m.edit_text(
-                f"Failed to fetch video from YouTube.\n\n**Reason:** {ex}"
+                f"Failed to fetch video from YouTube.\n\n●ʀᴇᴀsᴏɴ {ex}"
             )
 
         await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
