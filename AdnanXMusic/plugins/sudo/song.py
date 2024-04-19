@@ -30,6 +30,15 @@ def shorten_views(views):
         views /= 1000.0
     return f"{views:.1f}T"
 
+def format_duration(duration):
+    hours = duration // 3600
+    minutes = (duration % 3600) // 60
+    seconds = duration % 60
+    if hours > 0:
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+    else:
+        return f"{minutes:02}:{seconds:02}"
+
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
@@ -63,13 +72,14 @@ async def song(_, message: Message):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
                 video_file = ydl.prepare_filename(info_dict)
-                duration = info_dict.get('duration', '')
+                duration_seconds = info_dict.get('duration', '')
+                duration_formatted = format_duration(duration_seconds)
 
             total_views = info_dict.get('view_count', '')
             total_views_short = shorten_views(total_views)
 
             bot_username = (await app.get_me()).username
-            rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
+            rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
             try:
                 await app.send_video(
                     chat_id=message.chat.id,
