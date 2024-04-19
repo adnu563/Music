@@ -23,70 +23,53 @@ async def song(_, message: Message):
         pass
     m = await message.reply_text("🔎")
 
-    query = "".join(" " + str(i) for i in message.command[1:])
-    ydl_opts = {"format": "bestaudio[ext=m4a]"}
-    try:
-        results = YoutubeSearch(query, max_results=5).to_dict()
-        link = f"https://youtube.com{results[0]['url_suffix']}"
-        title = results[0]["title"][:40]
-        thumbnail = results[0]["thumbnails"][0]
-        thumb_name = f"thumb{title}.jpg"
-        thumb = requests.get(thumbnail, allow_redirects=True)
-        open(thumb_name, "wb").write(thumb.content)
-        duration = results[0]["duration"]
+    command = message.command[0].lower()
 
-        # Fetch total views using yt_dlp
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(link, download=False)
-            total_views = info_dict.get("view_count", "N/A")
-    except Exception as ex:
-        LOGGER.error(ex)
-        return await m.edit_text(
-            f"Failed to fetch track from YouTube.\n\n**Reason:** `{ex}`"
-        )
-
-    await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(link, download=False)
-            audio_file = ydl.prepare_filename(info_dict)
-            ydl.process_info(info_dict)
-        bot_username = (await app.get_me()).username
-        rep = f"➠ Title: {title[:23]}\n➠ Duration: {duration}\n➠ Total Views: {total_views}\n\n➥ Uploaded by: @{bot_username}"
-        secmul, dur, dur_arr = 1, 0, duration.split(":")
-        for i in range(len(dur_arr) - 1, -1, -1):
-            dur += int(dur_arr[i]) * secmul
-            secmul *= 60
+    if command == "vsong":
         try:
-            visit_butt = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            text="YouTube",
-                            url=link,
-                        )
-                    ]
-                ]
+            query = " ".join(message.command[1:])
+            results = YoutubeSearch(query, max_results=5).to_dict()
+            link = f"https://youtube.com{results[0]['url_suffix']}"
+            title = results[0]["title"][:40]
+            thumbnail = results[0]["thumbnails"][0]
+            thumb_name = f"thumb{title}.jpg"
+            video_file = f"{title}.mp4"
+            thumb_data = requests.get(thumbnail, allow_redirects=True)
+            open(thumb_name, "wb").write(thumb_data.content)
+        except Exception as ex:
+            LOGGER.error(ex)
+            return await m.edit_text(
+                f"Failed to fetch video from YouTube.\n\n**Reason:** `{ex}`"
             )
-            await app.send_audio(
-                chat_id=message.chat.id,  # Send the song in the same chat where the command was called
-                audio=audio_file,
-                caption=rep,
-                thumb=thumb_name,
-                title=title,
-                duration=dur,
-                reply_markup=visit_butt,
-            )
-            await m.delete()  # Delete the message indicating that the song is being downloaded
+
+        await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
+        try:
+            ydl_opts = {"format": "best"}
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(link, download=True)
+                video_file = ydl.prepare_filename(info_dict)
+
+            bot_username = (await app.get_me()).username
+            rep = f"➠ Title: {title[:23]}\n\n➥ Uploaded by: @{bot_username}"
+            try:
+                await app.send_video(
+                    chat_id=message.chat.id,
+                    video=video_file,
+                    caption=rep,
+                    thumb=thumb_name
+                )
+                await m.delete()  # Delete the message indicating that the video is being downloaded
+            except Exception as e:
+                LOGGER.error(e)
+                return await m.edit_text("Failed to send video.")
         except Exception as e:
             LOGGER.error(e)
-            return await m.edit_text("Failed to send audio.")
-    except Exception as e:
-        LOGGER.error(e)
-        return await m.edit_text("Failed to upload audio on Telegram servers.")
+            return await m.edit_text("Failed to download and upload video.")
 
-    try:
-        os.remove(audio_file)
-        os.remove(thumb_name)
-    except Exception as ex:
-        LOGGER.error(ex)
+        try:
+            if os.path.exists(video_file):
+                os.remove(video_file)
+            if os.path.exists(thumb_name):
+                os.remove(thumb_name)
+        except Exception as ex:
+            LOGGER.error(ex)
