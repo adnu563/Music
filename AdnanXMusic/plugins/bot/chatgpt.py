@@ -20,7 +20,7 @@ def chatmodal(prompt):
     print(response)
     chatStr += f"{response['choices'][0]['text']}"
     return response['choices'][0]['text']
-bot = telebot.TeleBot(BOT_API)
+bot = telebot.TeleBot("BOT_API")
 
 @bot.message_handler(['start'])
 def start(message):
