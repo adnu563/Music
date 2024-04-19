@@ -70,10 +70,6 @@ async def song(_, message: Message):
 
             bot_username = (await app.get_me()).username
             rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
-            secmul, dur, dur_arr = 1, 0, duration.split(":")
-        for i in range(len(dur_arr) - 1, -1, -1):
-            dur += int(dur_arr[i]) * secmul
-            secmul *= 60
             try:
                 await app.send_video(
                     chat_id=message.chat.id,
