@@ -26,3 +26,4 @@ youtube-search-python
 python-telegram-bot
 pyTelegramBotAPI
 openai
+telebot
