@@ -49,7 +49,7 @@ async def song(_, message: Message):
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, "wb").write(thumb.content)
         duration = results[0]["duration"]
-
+        singer = results[0]["channel"]
         # Fetch total views using yt_dlp
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
