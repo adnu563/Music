@@ -63,7 +63,8 @@ async def song(_, message: Message):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
                 video_file = ydl.prepare_filename(info_dict)
-                duration = info_dict.get('duration', '')
+                duration_seconds = info_dict.get('duration', 0)
+                duration = f"{duration_seconds // 60}:{duration_seconds % 60:02d}"
 
             total_views = info_dict.get('view_count', '')
             total_views_short = shorten_views(total_views)
@@ -92,3 +93,6 @@ async def song(_, message: Message):
                 os.remove(thumb_name)
         except Exception as ex:
             LOGGER.error(ex)
+
+# Run the app
+app.run()
