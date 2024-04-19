@@ -77,10 +77,7 @@ async def song(_, message: Message):
             visit_butt = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(
-                            text="YouTube",
-                            url=link,
-                        )
+                        
                     ]
                 ]
             )
