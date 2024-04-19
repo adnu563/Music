@@ -24,7 +24,7 @@ def shorten_views(views):
     if views < 1000:
         return str(views)  # If less than 1000, return as it is
 
-    for unit in ["", "K", "M", "B"]:
+    for unit in ["", "K", "M", "B", "T"]:
         if views < 1000.0:
             return f"{views:.1f}{unit}" if unit else f"{views:.0f}"
         views /= 1000.0
