@@ -1,8 +1,8 @@
 import os
-import requests
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
+from pytube import YouTube
 from AdnanXMusic import app
 import logging
 
@@ -32,8 +32,9 @@ async def song(_, message: Message):
             title = results[0]["title"][:40]
             thumbnail = results[0]["thumbnails"][0]
             thumb_name = f"thumb{title}.jpg"
-            thumb = requests.get(thumbnail, allow_redirects=True)
-            open(thumb_name, "wb").write(thumb.content)
+            video_file = f"{title}.mp4"
+            thumb_data = requests.get(thumbnail, allow_redirects=True)
+            open(thumb_name, "wb").write(thumb_data.content)
         except Exception as ex:
             LOGGER.error(ex)
             return await m.edit_text(
@@ -42,9 +43,8 @@ async def song(_, message: Message):
 
         await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
         try:
-            video_data = requests.get(link)
-            video_file = f"{title}.mp4"
-            open(video_file, "wb").write(video_data.content)
+            yt = YouTube(link)
+            yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download(filename=video_file)
 
             bot_username = (await app.get_me()).username
             rep = f"➠ Title: {title[:23]}\n\n➥ Uploaded by: @{bot_username}"
