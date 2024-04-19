@@ -1,6 +1,10 @@
 from config import *
 import telebot
 import openai
+from AdnanXMusic import app
+import logging
+
+BOT_MENTION = "AdnanXMusic"
 
 chatStr = ''
 
