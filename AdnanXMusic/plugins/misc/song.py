@@ -15,6 +15,21 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 
 BOT_MENTION = "AdnanXMusic"
 
+def shorten_views(views):
+    try:
+        views = int(views)
+    except ValueError:
+        return views  # Return as it is if not convertible to int
+
+    if views < 1000:
+        return str(views)  # If less than 1000, return as it is
+
+    for unit in ["", "K", "M", "B"]:
+        if views < 1000.0:
+            return f"{views:.1f}{unit}" if unit else f"{views:.0f}"
+        views /= 1000.0
+    return f"{views:.1f}T"
+
 @app.on_message(filters.command(["song", "music"]))
 async def song(_, message: Message):
     try:
@@ -39,6 +54,7 @@ async def song(_, message: Message):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             total_views = info_dict.get("view_count", "N/A")
+            total_views_short = shorten_views(total_views)
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
@@ -52,7 +68,7 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         bot_username = (await app.get_me()).username
-        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
+        rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
