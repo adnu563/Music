@@ -103,5 +103,3 @@ async def song(_, message: Message):
                 os.remove(thumb_name)
         except Exception as ex:
             LOGGER.error(ex)
-
-Added Youtube Channel Name and Singer Name Problem kindly fix it
