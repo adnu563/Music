@@ -2,9 +2,6 @@ from config import *
 import telebot
 import openai
 
-# Assuming you have defined BOT_API and OPENAI_KEY in a config file
-from config import BOT_API, OPENAI_KEY
-
 chatStr = ''
 
 def chatmodal(prompt):
