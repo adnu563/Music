@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 
 BOT_MENTION = "AdnanXMusic"
 
-@app.on_message(filters.command(["song", "vsong", "video", "music"]))
+@app.on_message(filters.command(["song", "music"]))
 async def song(_, message: Message):
     try:
         await message.delete()
