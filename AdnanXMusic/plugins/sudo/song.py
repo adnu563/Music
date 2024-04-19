@@ -54,7 +54,7 @@ async def song(_, message: Message):
             query = " ".join(message.command[1:])
             results = YoutubeSearch(query, max_results=5).to_dict()
             link = f"https://youtube.com{results[0]['url_suffix']}"
-            title = results[0]["title"][:90]
+            title = results[0]["title"][:40]
             thumbnail = results[0]["thumbnails"][0]
             thumb_name = f"thumb{title}.jpg"
             video_file = f"{title}.mp4"
@@ -70,6 +70,7 @@ async def song(_, message: Message):
         try:
             ydl_opts = {
                 'format': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
+                'outtmpl': f'{title}.mp4',
             }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
