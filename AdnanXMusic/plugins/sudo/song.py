@@ -15,6 +15,21 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 
 BOT_MENTION = "AdnanXMusic"
 
+def shorten_views(views):
+    try:
+        views = int(views)
+    except ValueError:
+        return views  # Return as it is if not convertible to int
+
+    if views < 1000:
+        return str(views)  # If less than 1000, return as it is
+
+    for unit in ["", "K", "M", "B"]:
+        if views < 1000.0:
+            return f"{views:.1f}{unit}" if unit else f"{views:.0f}"
+        views /= 1000.0
+    return f"{views:.1f}T"
+
 @app.on_message(filters.command(["song", "vsong", "video", "music"]))
 async def song(_, message: Message):
     try:
@@ -50,7 +65,7 @@ async def song(_, message: Message):
                 video_file = ydl.prepare_filename(info_dict)
 
             bot_username = (await app.get_me()).username
-            rep = f"➠ Title: {title[:23]}\n\n➥ Uploaded by: @{bot_username}"
+            rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
             try:
                 await app.send_video(
                     chat_id=message.chat.id,
