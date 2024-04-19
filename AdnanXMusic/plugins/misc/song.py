@@ -52,7 +52,10 @@ async def song(_, message: Message):
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
-                video_file = info_dict.get('filename', None)
+                video_file = info_dict.get('filename')
+                if not video_file:
+                    raise Exception("Failed to download video")
+
             bot_username = (await app.get_me()).username
             rep = f"➠ Title: {title[:23]}\n➠ Duration: {duration}\n➠ Total Views: {total_views}\n\n➥ Uploaded by: @{bot_username}"
             try:
