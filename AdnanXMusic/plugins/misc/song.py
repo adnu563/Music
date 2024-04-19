@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 # Configure the LOGGER object
 logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
 
-BOT_USERNAME = "AdnanXMusic" 
+BOT_USERNAME = "AdnanXMusic"  # Replace "AdnanXMusic" with your bot username
 
 def shorten_views(views):
     try:
@@ -71,7 +71,7 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         bot_mention = f"@{BOT_USERNAME}"  # Mention the bot username
-        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n\nUploaded by {app_mention} {bot_mention}"
+        rep = f"➠  ᴛɪᴛʟᴇ: {song_name[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➠ ꜱɪɴɢᴇʀ: {singer}\n\nUploaded by {app.APP_NAME} {bot_mention}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
