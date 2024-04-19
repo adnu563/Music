@@ -1,4 +1,4 @@
-from config import *
+from config import
 import telebot
 import openai
 
