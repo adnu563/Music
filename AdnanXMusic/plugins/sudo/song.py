@@ -88,7 +88,7 @@ async def song(_, message: Message):
                     chat_id=message.chat.id,
                     video=video_file,
                     caption=rep,
-                    thumb=thumb_name
+                    thumb=thumb_name if os.path.exists(thumb_name) else None
                 )
                 await m.delete()  # Delete the message indicating that the video is being downloaded
             except Exception as e:
