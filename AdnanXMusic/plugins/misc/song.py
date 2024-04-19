@@ -8,7 +8,7 @@ from AdnanXMusic import app
 import logging
 
 # Initialize the LOGGER object
-LOGGER = logging.getLogger(name)
+LOGGER = logging.getLogger(__name__)
 
 # Configure the LOGGER object
 logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
@@ -42,7 +42,7 @@ async def song(_, message: Message):
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
-            f"Failed to fetch track from YouTube.\n\n**Reason:** {ex}"
+            f"Failed to fetch track from YouTube.\n\n**Reason:** `{ex}`"
         )
 
     await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
