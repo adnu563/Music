@@ -2,11 +2,14 @@ from config import *
 import telebot
 import openai
 
+# Assuming you have defined BOT_API and OPENAI_KEY in a config file
+from config import BOT_API, OPENAI_KEY
+
 chatStr = ''
 
 def chatmodal(prompt):
     global chatStr
-    openai.api_key =OPENAI_KEY
+    openai.api_key = OPENAI_KEY
     chatStr += f"Adnan: {prompt}\nRiDi: "
     response = openai.Completion.create(
                     model="text-davinci-003",
@@ -20,21 +23,21 @@ def chatmodal(prompt):
     print(response)
     chatStr += f"{response['choices'][0]['text']}"
     return response['choices'][0]['text']
+
 bot = telebot.TeleBot("BOT_API")
 
-@bot.message_handler(['start'])
+@bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message,"hello welcome to FarhanXMusic")
-    
-@bot.message_handler()
-def chat(messagge):
+    bot.reply_to(message, "Hello! Welcome to FarhanXMusic")
+
+@bot.message_handler(func=lambda message: True)
+def chat(message):
     try:
         reply = chatmodal(message.text)
-        bot.reply_to(message,reply)
+        bot.reply_to(message, reply)
     except Exception as e:
         print(e)
-        bot.reply_to(message,e)
-
+        bot.reply_to(message, str(e))
 
 print("Bot Started....")
 bot.polling()
