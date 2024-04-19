@@ -25,7 +25,7 @@ async def song(_, message: Message):
 
     command = message.command[0].lower()
 
-    if command == "vsong":
+    if command == "ytdl":
         try:
             query = " ".join(message.command[1:])
             results = YoutubeSearch(query, max_results=5).to_dict()
