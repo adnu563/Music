@@ -35,6 +35,10 @@ async def song(_, message: Message):
         open(thumb_name, "wb").write(thumb.content)
         duration = results[0]["duration"]
 
+        # Fetch total views using yt_dlp
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=False)
+            total_views = info_dict.get("view_count", "N/A")
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
@@ -48,7 +52,7 @@ async def song(_, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         bot_username = (await app.get_me()).username
-        rep = f"➠ Title: {title[:23]}\n➠ Duration: {duration}\n\n➥ Uploaded by: @{bot_username}"
+        rep = f"➠ Title: {title[:23]}\n➠ Duration: {duration}\n➠ Total Views: {total_views}\n\n➥ Uploaded by: @{bot_username}"
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(dur_arr[i]) * secmul
