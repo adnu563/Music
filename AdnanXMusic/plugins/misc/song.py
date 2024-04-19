@@ -74,6 +74,9 @@ async def song(_, message: Message):
             dur += int(dur_arr[i]) * secmul
             secmul *= 60
         try:
+            keyboard = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("Track Details", callback_data="track_details")]]
+            )
             await app.send_audio(
                 chat_id=message.chat.id,  # Send the song in the same chat where the command was called
                 audio=audio_file,
@@ -81,7 +84,7 @@ async def song(_, message: Message):
                 thumb=thumb_name,
                 title=title,
                 duration=dur,
-                mention=message.from_user.id  # Mention the user who uploaded the song
+                reply_markup=keyboard
             )
             await m.delete()  # Delete the message indicating that the song is being downloaded
         except Exception as e:
