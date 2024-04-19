@@ -60,7 +60,8 @@ async def song(_, message: Message):
             video_file = f"{title}.mp4"
             thumb_data = requests.get(thumbnail, allow_redirects=True)
             open(thumb_name, "wb").write(thumb_data.content)
-            singer = results[0]["channel"]
+            channel_name = results[0]["channel"]
+            singer = results[0]["title"]
         except Exception as ex:
             LOGGER.error(ex)
             return await m.edit_text(
@@ -80,7 +81,7 @@ async def song(_, message: Message):
             total_views_short = shorten_views(total_views)
 
             bot_username = (await app.get_me()).username
-            rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ꜱɪɴɢᴇʀ: {singer}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
+            rep = f"➠  ᴛɪᴛʟᴇ: {title[:23]}\n➠ ꜱɪɴɢᴇʀ: {singer}\n➠ ᴄʜᴀɴɴᴇʟ: {channel_name}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
             try:
                 await app.send_video(
                     chat_id=message.chat.id,
