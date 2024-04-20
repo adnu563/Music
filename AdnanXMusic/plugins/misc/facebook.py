@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 from aiogram import Bot, types
-import youtube_dl
+import yt_dl
 import requests
 import config
 
