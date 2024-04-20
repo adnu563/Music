@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
-from aiogram import Bot, types, Dispatcher, executor
+from aiogram import Bot, types, Dispatcher
+from aiogram.dispatcher import executor
 import requests
 import config
 
