@@ -1,7 +1,8 @@
 import aiohttp
 import asyncio
 from aiogram import Bot, types, Dispatcher
-from aiogram.dispatcher import executor
+from aiogram.dispatcher import Dispatcher
+
 import requests
 import config
 
@@ -54,4 +55,4 @@ async def download_facebook_video(message: types.Message):
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(dp.start_polling(skip_updates=True))
