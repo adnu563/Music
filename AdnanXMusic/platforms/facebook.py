@@ -6,13 +6,11 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.types import ParseMode
 from aiogram.utils import executor
 import requests
-from confiq import
+from config import API_TOKEN  # Corrected import statement
 from AdnanXMusic.utils.database import is_on_off
 from AdnanXMusic.utils.formatters import time_to_seconds
 
-BOT MENTION = "AdnanXMusic"
-
-API_TOKEN = '6613472799:AAFeDrOP1k_Ipie5KOUAn_Kj5tN7ZshriWw'
+BOT_MENTION = "AdnanXMusic"  # Corrected variable assignment
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
