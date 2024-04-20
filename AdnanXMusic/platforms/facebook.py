@@ -12,7 +12,7 @@ from AdnanXMusic.utils.formatters import time_to_seconds
 
 BOT MENTION = "AdnanXMusic"
 
-API_TOKEN = 'YOUR_API_TOKEN'
+API_TOKEN = '6613472799:AAFeDrOP1k_Ipie5KOUAn_Kj5tN7ZshriWw'
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
