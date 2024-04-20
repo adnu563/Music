@@ -1,19 +1,10 @@
 import aiohttp
 import asyncio
-from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
-from aiogram.types import ParseMode
-from aiogram.utils import executor
+from aiogram import Bot, types, Dispatcher, executor
 import requests
-import configparser
-import os
+import config
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-
-API_TOKEN = config['telegram']['api_token']
-
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=config.API_TOKEN)
 dp = Dispatcher(bot)
 
 
