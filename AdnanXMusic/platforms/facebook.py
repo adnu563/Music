@@ -7,6 +7,8 @@ from aiogram.types import ParseMode
 from aiogram.utils import executor
 import requests
 from confiq import
+from AdnanXMusic.utils.database import is_on_off
+from AdnanXMusic.utils.formatters import time_to_seconds
 
 BOT MENTION = "AdnanXMusic"
 
