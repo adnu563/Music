@@ -1,37 +1,25 @@
 import aiohttp
 import asyncio
-from aiogram import Bot, types, Dispatcher
-from aiogram.dispatcher import Dispatcher
-
+from aiogram import Bot, types
+import youtube_dl
 import requests
 import config
 
 bot = Bot(token=config.API_TOKEN)
-dp = Dispatcher(bot)
 
 
 async def download_video(url: str, file_name: str):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                if resp.status == 200:
-                    with open(file_name, 'wb') as f:
-                        f.write(await resp.read())
-    except Exception as e:
-        print("Error downloading video:", e)
+    ydl_opts = {'outtmpl': file_name}
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
 
 
-@dp.message_handler(commands=['start'])
+@bot.message_handler(commands=['start'])
 async def start(message: types.Message):
     await message.reply("Welcome! Send me a Facebook video link to download.")
 
 
-@dp.message_handler(commands=['fb'])
-async def download_facebook_video_command(message: types.Message):
-    await download_facebook_video(message)
-
-
-@dp.message_handler(regexp=r'^(https?:\/\/)?(www\.)?facebook\.com\/.*\/videos\/.+$')
+@bot.message_handler(regexp=r'^(https?:\/\/)?(www\.)?facebook\.com\/.*\/videos\/.+$')
 async def download_facebook_video(message: types.Message):
     try:
         url = message.text
@@ -55,4 +43,4 @@ async def download_facebook_video(message: types.Message):
 
 
 if __name__ == '__main__':
-    asyncio.run(dp.start_polling(skip_updates=True))
+    bot.polling()
