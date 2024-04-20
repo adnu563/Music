@@ -1,4 +1,3 @@
-import os
 import aiohttp
 import asyncio
 from aiogram import Bot, types
@@ -6,11 +5,13 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.types import ParseMode
 from aiogram.utils import executor
 import requests
-from config import API_TOKEN  # Corrected import statement
-from AdnanXMusic.utils.database import is_on_off
-from AdnanXMusic.utils.formatters import time_to_seconds
+import configparser
+import os
 
-BOT_MENTION = "AdnanXMusic"  # Corrected variable assignment
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+API_TOKEN = config['telegram']['api_token']
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -29,13 +30,22 @@ async def start(message: types.Message):
     await message.reply("Welcome! Send me a Facebook video link to download.")
 
 
+@dp.message_handler(commands=['fb'])  # Added command handler
+async def download_facebook_video_command(message: types.Message):
+    await download_facebook_video(message)
+
+
 @dp.message_handler(regexp=r'^(https?:\/\/)?(www\.)?facebook\.com\/.*\/videos\/.+$')
 async def download_facebook_video(message: types.Message):
     url = message.text
     response = requests.get(url)
+    print("Facebook API Response:", response.content)  # Debugging
     video_url = None
     if response.status_code == 200:
-        video_url = response.json()['data'][0]['source']
+        try:
+            video_url = response.json()['data'][0]['source']
+        except KeyError:
+            pass
     if video_url:
         file_name = f"video_{message.message_id}.mp4"
         await message.reply("Downloading video...")
