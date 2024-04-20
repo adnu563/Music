@@ -80,7 +80,7 @@ async def song(_, message: Message):
             total_views_short = shorten_views(total_views)
 
             bot_username = (await app.get_me()).username
-            rep = f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ꜱɪɴɢᴇʀ: {singer}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
+            rep = f"➠ ᴛɪᴛʟᴇ: {title[:23]}\n➠ ᴅᴜʀᴀᴛɪᴏɴ: {duration_formatted}\n➠ ᴛᴏᴛᴀʟ: {total_views_short}\n\n➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ: @{bot_username}"
             try:
                 await app.send_video(
                     chat_id=message.chat.id,
