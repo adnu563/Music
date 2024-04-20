@@ -4,7 +4,7 @@ from aiogram import Bot, types
 import requests
 import config
 
-bot = Bot(token=config.API_TOKEN)
+BOT MENTION = "AdnanXMusic"
 
 
 async def download_video(url: str, file_name: str):
