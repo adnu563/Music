@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 NAME = "ADDA X MUSIC"
 
 
-async def get_thumb(url):
+def get_thumb(url):
     response = requests.get(url).text
     image_link = (response.split('<link rel="image_src" href="'))[1].split('">')[0]
     image_name = image_link.split('vi/')[1].split('/')[0]
@@ -123,7 +123,7 @@ def edit(image_title, video_id, duration, views, channel):
 
 def main():
     url = input("Give Link: ")
-    img_filename = await get_thumb(url)
+    img_filename = get_thumb(url)
     data = download_thumb(url)
     edit(data[0], data[1], data[2], data[3], data[4])
 
