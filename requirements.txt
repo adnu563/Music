@@ -30,3 +30,4 @@ telebot
 beautifulsoup4
 aiogram
 Dispatcher
+urllib3
