@@ -11,6 +11,9 @@ from bs4 import BeautifulSoup
 
 NAME = "ADDA X MUSIC"
 
+# Assuming get_thumb is located in AdnanXMusic/utils/thumbnails.py
+from AdnanXMusic.utils.thumbnails import get_thumb
+
 
 def get_duration(response):
     soup = BeautifulSoup(response, 'html.parser')
@@ -66,7 +69,6 @@ def edit(image_title, video_id, duration, views, channel):
 
     # Fonts And Color
     font = ImageFont.truetype("assets/font.ttf", 30)
-    font = ImageFont.truetype("assets/font2.ttf", 30)
     text_color = (255, 255, 255)
 
     # Top Left Sight Writing
