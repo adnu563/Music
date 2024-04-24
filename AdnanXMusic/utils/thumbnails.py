@@ -12,7 +12,13 @@ from bs4 import BeautifulSoup
 NAME = "ADDA X MUSIC"
 
 
+def get_thumb(url):
+    # Function to get thumbnail
+    pass
+
+
 def get_duration(response):
+    # Function to extract video duration
     soup = BeautifulSoup(response, 'html.parser')
     script_tag = soup.find('script', text=re.compile('ytInitialPlayerResponse'))
     if script_tag:
@@ -27,11 +33,13 @@ def get_duration(response):
 
 
 def get_views(response):
+    # Function to extract views count
     views = response.split('"shortViewCount":{"simpleText":"')[1].split('"}')[0]
     return views
 
 
 def get_middle(duration):
+    # Function to get the middle of the video duration
     minute = int(int(duration[1]) / 2)
     if minute < 10:
         minute = f"0{minute}"
@@ -42,6 +50,7 @@ def get_middle(duration):
 
 
 def download_thumb(url):
+    # Function to download thumbnail
     response = requests.get(url).text
     image_title = response.split('<meta name="title" content="')[1].split('">')[0]
     duration = get_duration(response)
@@ -57,6 +66,7 @@ def download_thumb(url):
 
 
 def edit(image_title, video_id, duration, views, channel):
+    # Function to edit thumbnail
     image = Image.open(f"assets/{video_id}.jpg")
     converter = ImageEnhance.Color(image)
     image = image.filter(ImageFilter.BLUR)
