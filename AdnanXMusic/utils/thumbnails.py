@@ -112,10 +112,7 @@ def main():
         url = input("Give Link: ")
         data = download_thumb(url)
         if data:
-            edit(data[0], data[1], data[2], data[3],
-def get_thumb():
-    # Function implementation
- data[4])
+            edit(data[0], data[1], data[2], data[3], data[4])
     except KeyboardInterrupt:
         print("\nProgram interrupted.")
     except Exception as e:
