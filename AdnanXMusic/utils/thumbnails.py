@@ -26,7 +26,7 @@ def get_duration(response):
         if video_details:
             video_json = video_details.group(1)
             video_data = json.loads(video_json)
-            if 'lengthSeconds' in video_data['videoDetails']:
+            if 'videoDetails' in video_data and 'lengthSeconds' in video_data['videoDetails']:
                 duration_seconds = int(video_data['videoDetails']['lengthSeconds'])
                 duration_formatted = str(timedelta(seconds=duration_seconds))
                 return duration_formatted
@@ -93,14 +93,15 @@ def edit(image_title, video_id, duration, views, channel):
     draw.text(position, text, fill=text_color, font=font)
 
     # Duration Start And Close
-    duritionX = duration.split(":")
-    middle_duration = get_middle(duritionX)
-    position = (x - 200, y)
-    draw.text(position, middle_duration, fill=text_color, font=font)
+    if duration:
+        duritionX = duration.split(":")
+        middle_duration = get_middle(duritionX)
+        position = (x - 200, y)
+        draw.text(position, middle_duration, fill=text_color, font=font)
 
-    full_duration = f"{duritionX[1]} : {duritionX[2]}"
-    position = (x - 80 + 800, y)
-    draw.text(position, full_duration, fill=text_color, font=font)
+        full_duration = f"{duritionX[1]} : {duritionX[2]}"
+        position = (x - 80 + 800, y)
+        draw.text(position, full_duration, fill=text_color, font=font)
 
     draw.text((x + 150, y + 125), f"{channel} | {views}", fill=text_color,
               font=ImageFont.truetype("arial.ttf", 20))
