@@ -34,3 +34,4 @@ urllib3
 utils
 thumbnails
 get_thumb
+partially
