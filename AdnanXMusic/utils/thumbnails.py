@@ -11,9 +11,6 @@ from bs4 import BeautifulSoup
 
 NAME = "ADDA X MUSIC"
 
-# Assuming get_thumb is located in AdnanXMusic/utils/thumbnails.py
-from AdnanXMusic.utils.thumbnails import get_thumb
-
 
 def get_duration(response):
     soup = BeautifulSoup(response, 'html.parser')
