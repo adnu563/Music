@@ -23,7 +23,7 @@ def clear(text):
             title += " " + i
     return title.strip()
 
-async def get_thumb(videoid):
+def get_thumb(videoid):
     # your existing get_thumb function
     pass
 
@@ -64,7 +64,7 @@ def edit(image_title, video_id, duration, views, channel):
     image.save(f"assets/{video_id}_edited.png")
 
 def main():
-    data = await get_thumb(input("Give Link: "))  # assuming this is an async function
+    data = get_thumb(input("Give Link: "))  # assuming this is a synchronous function
     edit(data["title"], data["id"], data["duration"], data["views"], data["channel"])
 
 if __name__ == "__main__":
