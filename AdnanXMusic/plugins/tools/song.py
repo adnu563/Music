@@ -5,7 +5,7 @@ from pyrogram.types import Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 
-@app.on_message(filters.command(download"))
+@app.on_message(filters.command("download"))
 async def download_video(_, message: Message):
     try:
         await message.delete()
