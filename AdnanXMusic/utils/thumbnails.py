@@ -5,6 +5,7 @@ import textwrap
 import urllib.request
 from bs4 import BeautifulSoup
 from datetime import timedelta
+from AdnanXMusic.utils.thumbnails import get_thumb
 from PIL import Image, ImageEnhance, ImageFilter, ImageDraw, ImageFont
 
 NAME = "ADDA X MUSIC"
