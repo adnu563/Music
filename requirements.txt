@@ -31,3 +31,6 @@ beautifulsoup4
 aiogram
 Dispatcher
 urllib3
+utils
+thumbnails
+get_thumb
