@@ -8,7 +8,7 @@ from AdnanXMusic import app
 import logging
 
 # Initialize the LOGGER object
-LOGGER = logging.getLogger(name)
+LOGGER = logging.getLogger(__name__)  # Define the name
 
 # Configure the LOGGER object
 logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
