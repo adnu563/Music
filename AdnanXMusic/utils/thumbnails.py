@@ -5,7 +5,6 @@ import textwrap
 import urllib.request
 from bs4 import BeautifulSoup
 from datetime import timedelta
-from AdnanXMusic.utils.thumbnails import get_thumb
 from PIL import Image, ImageEnhance, ImageFilter, ImageDraw, ImageFont
 
 NAME = "ADDA X MUSIC"
@@ -54,7 +53,7 @@ def download_thumb(url):
         print("Error downloading thumbnail:", e)
         return None
 
-def edit(image_title, video_id, duration, views, channel):
+def edit(image_title, video_id, duration, views, channel, get_thumb_func):
     try:
         image = Image.open(f"assets/{video_id}.jpg")
         converter = ImageEnhance.Color(image)
@@ -97,7 +96,7 @@ def edit(image_title, video_id, duration, views, channel):
         # Overlay Image
         overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
         image = Image.alpha_composite(image.convert("RGBA"), overlay)
-        image_to_paste = Image.open("overlay.png")
+        image_to_paste = get_thumb_func()  # Call the function passed as an argument
         image_to_paste = image_to_paste.convert("RGBA")
         paste_position = (x - 80, y - 50)
         image.paste(image_to_paste, paste_position, image_to_paste)
@@ -112,7 +111,7 @@ def main():
         url = input("Give Link: ")
         data = download_thumb(url)
         if data:
-            edit(data[0], data[1], data[2], data[3], data[4])
+            edit(data[0], data[1], data[2], data[3], data[4], get_thumb)
     except KeyboardInterrupt:
         print("\nProgram interrupted.")
     except Exception as e:
