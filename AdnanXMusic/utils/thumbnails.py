@@ -4,6 +4,7 @@ import textwrap
 import urllib.request
 import json
 from datetime import timedelta
+from urllib.parse import urlparse
 
 import requests
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
@@ -13,6 +14,11 @@ NAME = "ADDA X MUSIC"
 
 
 def get_thumb(url):
+    # Check if the URL has a scheme, if not, add "http://" as the default scheme
+    parsed_url = urlparse(url)
+    if not parsed_url.scheme:
+        url = "http://" + url
+
     response = requests.get(url).text
     image_link = (response.split('<link rel="image_src" href="'))[1].split('">')[0]
     image_name = image_link.split('vi/')[1].split('/')[0]
