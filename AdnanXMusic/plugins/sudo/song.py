@@ -1,105 +1,57 @@
 import os
 import requests
-import yt_dlp
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from youtube_search import YoutubeSearch
+from pyrogram.types import Message
 from AdnanXMusic import app
-import logging
 
-# Initialize the LOGGER object
-LOGGER = logging.getLogger(__name__)
-
-# Configure the LOGGER object
-logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or any level you prefer
-
-BOT_MENTION = "AdnanXMusic"
-
-def shorten_views(views):
-    try:
-        views = int(views)
-    except ValueError:
-        return views  # Return as it is if not convertible to int
-
-    if views < 1000:
-        return str(views)  # If less than 1000, return as it is
-
-    for unit in ["", "K", "M", "B"]:
-        if views < 1000.0:
-            return f"{views:.1f}{unit}" if unit else f"{views:.0f}"
-        views /= 1000.0
-    return f"{views:.1f}T"
-
-def format_duration(duration):
-    hours = duration // 3600
-    minutes = (duration % 3600) // 60
-    seconds = duration % 60
-    if hours > 0:
-        return f"{hours:02}:{minutes:02}:{seconds:02}"
-    else:
-        return f"{minutes:02}:{seconds:02}"
-
-@app.on_message(filters.command(["song", "vsong", "video", "music"]))
-async def song(_, message: Message):
+@app.on_message(filters.command("download"))
+async def download_video(_, message: Message):
     try:
         await message.delete()
     except:
         pass
-    m = await message.reply_text("🔎")
 
-    command = message.command[0].lower()
+    m = await message.reply_text("🔎 Downloading video, please wait...")
 
-    if command == "video":
-        try:
-            query = " ".join(message.command[1:])
-            results = YoutubeSearch(query, max_results=5).to_dict()
-            link = f"https://youtube.com{results[0]['url_suffix']}"
-            title = results[0]["title"][:40]
-            thumbnail = results[0]["thumbnails"][0]
-            thumb_name = f"thumb{title}.jpg"
-            video_file = f"{title}.mp4"
-            thumb_data = requests.get(thumbnail, allow_redirects=True)
-            open(thumb_name, "wb").write(thumb_data.content)
-            singer = results[0]["channel"]
-        except Exception as ex:
-            LOGGER.error(ex)
-            return await m.edit_text(
-                f"<b>Failed to fetch track from YouTube.\n●ʀᴇᴀsᴏɴ:</b> {ex}"
-            )
+    link = message.text.split(" ", 1)[1]
 
-        await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
-        try:
-            ydl_opts = {"format": "best"}
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info_dict = ydl.extract_info(link, download=True)
-                video_file = ydl.prepare_filename(info_dict)
-                duration_seconds = info_dict.get('duration', '')
-                duration_formatted = format_duration(duration_seconds)
+    try:
+        response = requests.get(link)
+        if response.status_code == 200:
+            content = response.text
 
-            total_views = info_dict.get('view_count', '')
-            total_views_short = shorten_views(total_views)
+            # Check if it's an index link or m3u8 link
+            if "m3u8" in content:
+                # Extract the direct video link from m3u8 content
+                direct_link = extract_direct_link_from_m3u8(content)
+            elif "index" in content:
+                # Extract the direct video link from index content
+                direct_link = extract_direct_link_from_index(content)
+            else:
+                raise ValueError("Unsupported link format")
 
-            bot_username = (await app.get_me()).username
-            rep = f"<b>➠ ᴛɪᴛʟᴇ:</b> {title[:25]}\n<b>➠ ᴅᴜʀᴀᴛɪᴏɴ:</b> {duration_formatted}\n<b>➠ ᴛᴏᴛᴀʟ ᴠɪᴇᴡs:</b> {total_views_short}\n\n<b>➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ:</b> @{bot_username}"
-            try:
-                await app.send_video(
-                    chat_id=message.chat.id,
-                    video=video_file,
-                    caption=rep,
-                    thumb=thumb_name
-                )
-                await m.delete()  # Delete the message indicating that the video is being downloaded
-            except Exception as e:
-                LOGGER.error(e)
-                return await m.edit_text("Failed to send video.")
-        except Exception as e:
-            LOGGER.error(e)
-            return await m.edit_text("Failed to download and upload video.")
+            # Download the video
+            video_file = "downloaded_video.mp4"
+            with open(video_file, "wb") as f:
+                video_response = requests.get(direct_link)
+                f.write(video_response.content)
 
-        try:
-            if os.path.exists(video_file):
-                os.remove(video_file)
-            if os.path.exists(thumb_name):
-                os.remove(thumb_name)
-        except Exception as ex:
-            LOGGER.error(ex)
+            # Send the video to the user
+            await app.send_video(message.chat.id, video_file, caption="Downloaded video")
+
+            # Delete temporary files
+            os.remove(video_file)
+
+            await m.delete()  # Delete the message indicating downloading
+        else:
+            await m.edit_text("Failed to fetch video link.")
+    except Exception as e:
+        await m.edit_text(f"Error: {e}")
+
+def extract_direct_link_from_m3u8(content):
+    # Logic to extract direct video link from m3u8 content
+    pass
+
+def extract_direct_link_from_index(content):
+    # Logic to extract direct video link from index content
+    pass
