@@ -1,35 +1,59 @@
-import os
 import re
-import aiofiles
-import aiohttp
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
-from unidecode import unidecode
-from youtubesearchpython.__future__ import VideosSearch
-from config import YOUTUBE_IMG_URL
+import json
+import requests
+import textwrap
+import urllib.request
+from bs4 import BeautifulSoup
+from datetime import timedelta
+# from AdnanXMusic import app
+from PIL import Image,ImageEnhance, ImageFilter, ImageDraw, ImageFont
 
-def changeImageSize(maxWidth, maxHeight, image):
-    widthRatio = maxWidth / image.size[0]
-    heightRatio = maxHeight / image.size[1]
-    newWidth = int(widthRatio * image.size[0])
-    newHeight = int(heightRatio * image.size[1])
-    newImage = image.resize((newWidth, newHeight))
-    return newImage
 
-def clear(text):
-    list = text.split(" ")
-    title = ""
-    for i in list:
-        if len(title) + len(i) < 60:
-            title += " " + i
-    return title.strip()
+NAME = "ADDA X MUSIC"
 
-def get_thumb(videoid):
-    # your existing get_thumb function
-    pass
+def get_duration(response):
+    soup = BeautifulSoup(response, 'html.parser')
+    script_tag = soup.find('script', text=re.compile('ytInitialPlayerResponse'))
+    if script_tag:
+            video_details = re.search(r'ytInitialPlayerResponse\s*=\s*({.*?});', script_tag.string)
+            if video_details:
+                video_json = video_details.group(1)
+                video_data = json.loads(video_json)
+                if 'lengthSeconds' in video_data['videoDetails']:
+                    duration_seconds = int(video_data['videoDetails']['lengthSeconds'])
+                    duration_formatted = str(timedelta(seconds=duration_seconds))
+                    return duration_formatted
+
+
+def get_views(response):
+    views = response.split('"shortViewCount":{"simpleText":"')[1].split('"}')[0]
+    return views
+
+
 
 def get_middle(duration):
-    # your existing get_middle function
-    pass
+    minute = int(int(duration[1]) / 2)
+    if minute < 10:
+        minute = f"0{minute}"
+    seconds = int(int(duration[2]) / 2)
+    if seconds < 10:
+        seconds = f"0{seconds}"
+    return f"{minute} : {seconds}"
+
+def download_thumb(url):
+    response = requests.get(url).text
+    image_title = response.split('<meta name="title" content="')[1].split('">')[0]
+    duration = get_duration(response)
+    views = get_views(response)
+    channel_name = response.split(', "name": "')[1].split('"}}]}')[0]
+
+    image_link = (response.split('<link rel="image_src" href="'))[1].split('">')[0]
+    image_name = image_link.split('vi/')[1].split('/')[0]
+
+    img_filename, _ = urllib.request.urlretrieve(image_link, f"assets/{image_name}.jpg")
+    img = Image.open(img_filename)
+    return image_title, image_name, duration, views, channel_name
+
 
 def edit(image_title, video_id, duration, views, channel):
     image = Image.open(f"assets/{video_id}.jpg")
@@ -39,33 +63,61 @@ def edit(image_title, video_id, duration, views, channel):
     image = Image.alpha_composite(image.convert("RGBA"), overlay)
     draw = ImageDraw.Draw(image)
 
-    font_path = "AdnanXMusic/assets/font.ttf"
-    arial_path = "AdnanXMusic/assets/font2.ttf"
-    font = ImageFont.truetype(font_path, 30)
-    arial = ImageFont.truetype(arial_path, 30)
-    text_color = (255, 255, 255)
+    # Fonts And Color
+    font = ImageFont.truetype("arial.ttf", 30)
+    text_color = (255, 255, 255) 
 
-    x, y = image.size[0] // 4, image.size[1] // 2
 
-    draw.text((x, 30), unidecode(app.name), fill=text_color, font=arial)
-    draw.text((x - 300, y - 80), clear(image_title), fill=text_color, font=font)
-    draw.text((x - 480, y), get_middle(duration), fill=text_color, font=font)
-    draw.text((x + 320, y), f"{duration}", fill=text_color, font=font)
-    draw.text((x + 30, y + 125), f"{channel} | {views}", fill=text_color, font=arial)
+    # Top Left Sight Writting
+    position = (30, 30)  
+    draw.text(position, NAME, fill=text_color, font=font)
 
+
+    # Bottom X Y Value 
+    image_width, image_height = image.size
+    x = ((image_width // 2) // 2)
+    y = (image_height //2 ) + (image_height  // 4)
+
+
+    # Title OF The Video
+    position = (x, y - 80)
+    text = textwrap.fill(f"{image_title}", width=50)
+    draw.text(position, text, fill=text_color, font=font)
+
+    # Duration Start ANd Close
+    duritionX = duration.split(":")
+    middle_duration = get_middle(duritionX)
+    position = (x - 200 , y)  
+    draw.text(position, middle_duration, fill=text_color, font=font)
+
+    full_duration = f"{duritionX[1]} : {duritionX[2]}"
+    position = (x - 80 + 800 , y)  
+    draw.text(position, full_duration, fill=text_color, font=font)
+
+
+    draw.text((x + 150, y + 125), f"{channel} | {views}",fill=text_color,font=ImageFont.truetype("arial.ttf", 20))
+
+    # OVerLay Image
     overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
     image = Image.alpha_composite(image.convert("RGBA"), overlay)
     image_to_paste = Image.open("overlay.png")
     image_to_paste = image_to_paste.convert("RGBA")
     paste_position = (x - 80, y - 50)
     image.paste(image_to_paste, paste_position, image_to_paste)
+    
+    
+
+
 
     image.show()
     image.save(f"assets/{video_id}_edited.png")
 
-def main():
-    data = get_thumb(input("Give Link: "))  # assuming this is a synchronous function
-    edit(data["title"], data["id"], data["duration"], data["views"], data["channel"])
 
-if __name__ == "__main__":
-    main()
+def main():
+    data = download_thumb(input("Give LInk: "))
+    # data = download_thumb("https://www.youtube.com/watch?v=fEKtW-35cDw")
+    
+    edit(data[0], data[1], data[2], data[3], data[4])
+
+
+main()
