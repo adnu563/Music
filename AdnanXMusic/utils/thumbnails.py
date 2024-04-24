@@ -8,7 +8,7 @@ import textwrap
 import urllib.request
 from bs4 import BeautifulSoup
 from datetime import timedelta
-from PIL import Image,ImageEnhance, ImageFilter, ImageDraw, ImageFont
+from PIL import Image, ImageEnhance, ImageFilter, ImageDraw, ImageFont
 from unidecode import unidecode
 from config import YOUTUBE_IMG_URL
 
@@ -107,6 +107,5 @@ def main():
     data = download_thumb(input("Give Link: "))
     edit(data[0], data[1], data[2], data[3], data[4])
 
-main()
-
-# data = download_thumb(input("Give Link: "))  # Commented out to avoid EOFError
+if __name__ == "__main__":
+    main()
