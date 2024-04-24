@@ -51,13 +51,13 @@ def download_thumb(url):
     image_link = (response.split('<link rel="image_src" href="'))[1].split('">')[0]
     image_name = image_link.split('vi/')[1].split('/')[0]
 
-    img_filename, _ = urllib.request.urlretrieve(image_link, f"cache/{image_name}.jpg")
+    img_filename, _ = urllib.request.urlretrieve(image_link, f"assets/{image_name}.jpg")
     img = Image.open(img_filename)
     return image_title, image_name, duration, views, channel_name
 
 
 def edit(image_title, video_id, duration, views, channel):
-    image = Image.open(f"cache/{video_id}.jpg")
+    image = Image.open(f"assets/{video_id}.jpg")
     converter = ImageEnhance.Color(image)
     image = image.filter(ImageFilter.BLUR)
     overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
@@ -105,7 +105,7 @@ def edit(image_title, video_id, duration, views, channel):
     image.paste(image_to_paste, paste_position, image_to_paste)
 
     image.show()
-    image.save(f"cache/{video_id}_edited.png")
+    image.save(f"assets/{video_id}_edited.png")
 
 
 def main():
