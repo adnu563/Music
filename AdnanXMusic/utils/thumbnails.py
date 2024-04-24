@@ -64,7 +64,6 @@ def edit(image_title, video_id, duration, views, channel):
 
         # Fonts And Color
         font_path = "assets/font.ttf"
-        font_path = "assets/font2.ttf"
         font = ImageFont.truetype(font_path, 30)
         text_color = (255, 255, 255) 
 
