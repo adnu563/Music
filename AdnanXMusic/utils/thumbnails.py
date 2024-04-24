@@ -1,6 +1,5 @@
 import os
 import re
-
 import aiofiles
 import aiohttp
 import json
@@ -9,7 +8,6 @@ import textwrap
 import urllib.request
 from bs4 import BeautifulSoup
 from datetime import timedelta
-from AdnanXMusic import app
 from PIL import Image,ImageEnhance, ImageFilter, ImageDraw, ImageFont
 from unidecode import unidecode
 from config import YOUTUBE_IMG_URL
@@ -29,12 +27,9 @@ def get_duration(response):
                     duration_formatted = str(timedelta(seconds=duration_seconds))
                     return duration_formatted
 
-
 def get_views(response):
     views = response.split('"shortViewCount":{"simpleText":"')[1].split('"}')[0]
     return views
-
-
 
 def get_middle(duration):
     minute = int(int(duration[1]) / 2)
@@ -59,7 +54,6 @@ def download_thumb(url):
     img = Image.open(img_filename)
     return image_title, image_name, duration, views, channel_name
 
-
 def edit(image_title, video_id, duration, views, channel):
     image = Image.open(f"assets/{video_id}.jpg")
     converter = ImageEnhance.Color(image)
@@ -72,17 +66,14 @@ def edit(image_title, video_id, duration, views, channel):
     font = ImageFont.truetype("arial.ttf", 30)
     text_color = (255, 255, 255) 
 
-
     # Top Left Sight Writting
     position = (30, 30)  
     draw.text(position, NAME, fill=text_color, font=font)
-
 
     # Bottom X Y Value 
     image_width, image_height = image.size
     x = ((image_width // 2) // 2)
     y = (image_height //2 ) + (image_height  // 4)
-
 
     # Title OF The Video
     position = (x, y - 80)
@@ -99,7 +90,6 @@ def edit(image_title, video_id, duration, views, channel):
     position = (x - 80 + 800 , y)  
     draw.text(position, full_duration, fill=text_color, font=font)
 
-
     draw.text((x + 150, y + 125), f"{channel} | {views}",fill=text_color,font=ImageFont.truetype("arial.ttf", 20))
 
     # OVerLay Image
@@ -109,20 +99,14 @@ def edit(image_title, video_id, duration, views, channel):
     image_to_paste = image_to_paste.convert("RGBA")
     paste_position = (x - 80, y - 50)
     image.paste(image_to_paste, paste_position, image_to_paste)
-    
-    
-
-
 
     image.show()
     image.save(f"assets/{video_id}_edited.png")
 
-
 def main():
-    data = download_thumb(input("Give LInk: "))
-    # data = download_thumb("https://www.youtube.com/watch?v=fEKtW-35cDw")
-    
+    data = download_thumb(input("Give Link: "))
     edit(data[0], data[1], data[2], data[3], data[4])
 
-
 main()
+
+# data = download_thumb(input("Give Link: "))  # Commented out to avoid EOFError
