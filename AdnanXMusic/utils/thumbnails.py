@@ -30,8 +30,8 @@ def clear(text):
 
 
 async def get_thumb(videoid):
-    if os.path.isfile(f"cache/{videoid}.png"):
-        return f"cache/{videoid}.png"
+    if os.path.isfile(f"assets/{videoid}.png"):
+        return f"assets/{videoid}.png"
 
     url = f"https://www.youtube.com/watch?v={videoid}"
     try:
@@ -60,24 +60,12 @@ async def get_thumb(videoid):
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail) as resp:
                 if resp.status == 200:
-                    f = await aiofiles.open(f"cache/thumb{videoid}.png", mode="wb")
+                    f = await aiofiles.open(f"assets/thumb{videoid}.png", mode="wb")
                     await f.write(await resp.read())
                     await f.close()
 
-        youtube = Image.open(f"cache/thumb{videoid}.png")
+        youtube = Image.open(f"assets/thumb{videoid}.png")
         image1 = changeImageSize(1280, 720, youtube)
-
-        # Load overlay image
-        overlay_path = "AdnanXMusic/assets/overly.png"
-        overlay = Image.open(overlay_path)
-
-        # Resize overlay to fit YouTube thumbnail
-        overlay = overlay.resize(image1.size)
-
-        # Paste overlay onto the thumbnail
-        image1.paste(overlay, (0, 0), overlay)
-
-        # Add the rest of your code to draw text, lines, etc...
         image2 = image1.convert("RGBA")
         background = image2.filter(filter=ImageFilter.BoxBlur(10))
         enhancer = ImageEnhance.Brightness(background)
@@ -122,15 +110,12 @@ async def get_thumb(videoid):
             (255, 255, 255),
             font=arial,
         )
-
-        # Save the modified thumbnail
-        thumbnail_path = f"cache/{videoid}.png"
-        background.save(thumbnail_path)
-
-        # Clean up temporary files
-        os.remove(f"cache/thumb{videoid}.png")
-
-        return thumbnail_path
+        try:
+            os.remove(f"assets/thumb{videoid}.png")
+        except:
+            pass
+        background.save(f"assets/{videoid}.png")
+        return f"assets/{videoid}.png"
     except Exception as e:
         print(e)
         return YOUTUBE_IMG_URL
