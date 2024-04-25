@@ -16,6 +16,9 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 
 BOT_MENTION = "AdnanXMusic"
 
+# Fetch Spotify API key from environment variable
+spotify_api_key = os.environ.get("SPOTIFY_API_KEY")
+
 def shorten_views(views):
     try:
         views = int(views)
