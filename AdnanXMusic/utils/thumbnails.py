@@ -132,10 +132,11 @@ def edit(image_title, video_id, duration, views, channel):
         paste_position = (x - 80, y - 50)
         image.paste(image_to_paste, paste_position, image_to_paste)
 
-        image.show()
+        # image.show()  # Comment out image.show()
         image.save(f"assets/{video_id}_edited.png")
     except Exception as e:
         print(f"Error occurred while editing thumbnail: {e}")
+        print("» sᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ᴘʀᴏᴄᴇssɪɴɢ ʏᴏᴜʀ ǫᴜᴇʀʏ.\nᴇxᴄᴇᴘᴛɪᴏɴ : TypeError")
 
 
 def main():
