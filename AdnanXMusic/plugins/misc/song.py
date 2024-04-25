@@ -32,28 +32,16 @@ def shorten_views(views):
         views /= 1000.0
     return f"{views:.1f}T"
 
-def find_spotify_config():
-    # Define possible file names for Spotify API configuration file
-    possible_filenames = ['spotify_config.cfg', 'spotify_credentials.cfg', 'spotify_config.json']
-
-    # Search for the configuration file in predefined locations or in the current directory
-    for filename in possible_filenames:
-        if os.path.exists(filename):
-            return filename
-    return None
-
 def initialize_spotify():
-    # Find the Spotify API configuration file
-    config_file = find_spotify_config()
-
-    if config_file:
-        # Initialize Spotify client using the found configuration file
-        sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials.from_config_file(config_file))
-    else:
-        # Log an error if the configuration file is not found
-        LOGGER.error("Spotify API configuration file not found.")
+    client_id = os.getenv("SPOTIFY_CLIENT_ID")
+    client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+    
+    if not client_id or not client_secret:
+        LOGGER.error("Spotify API credentials not found in environment variables.")
         return None
-
+    
+    auth_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
+    sp = spotipy.Spotify(auth_manager=auth_manager)
     return sp
 
 # Initialize Spotify client
@@ -130,7 +118,7 @@ async def song(_, message: Message):
                 audio_file = ydl.prepare_filename(info_dict)
                 ydl.process_info(info_dict)
             bot_username = (await app.get_me()).username
-            app_name = app.dc.config.app_name if app.dc.config.app_name else "YourAppName"
+            app_name = os.getenv("APP_NAME") or "app.mention"
             rep = f"<b>➠ ᴛɪᴛʟᴇ:</b> {title[:20]}\n<b>➠ ᴅᴜʀᴀᴛɪᴏɴ:</b> {duration_formatted}\n<b>➠ ᴛᴏᴛᴀʟ ᴠɪᴇᴡs:</b> {total_views_short}\n\n<b>➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ:</b> {app_name} (@{bot_username})"
             secmul, dur, dur_arr = 1, 0, duration.split(":")
             for i in range(len(dur_arr) - 1, -1, -1):
