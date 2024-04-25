@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from youtubesearchpython.__future__ import VideosSearch
 
-from config import FAILED
+from config import YOUTUBE_IMG_URL
 from AdnanXMusic import BOT_ID, LOGGER, app
 
 
@@ -318,4 +318,4 @@ async def gen_qthumb(videoid, user_id):
         return f"cache/que{videoid}_{user_id}.png"
     except Exception as e:
         LOGGER.error(e)
-        return FAILED
+        return YOUTUBE_IMG_URL
