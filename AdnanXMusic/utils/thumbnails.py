@@ -105,7 +105,7 @@ async def get_thumb(videoid):
             font=arial,
         )
         draw.text(
-            (11p0, 08),
+            (1110, 08),
             f"{duration[:23]}",
             (255, 255, 255),
             font= ("AdnanXMusic/assets/AutourOne-Regular.ttf"),
