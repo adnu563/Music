@@ -1,16 +1,14 @@
 import os
 import re
-import textwrap
-import urllib.request
-import json
-from datetime import timedelta
-from urllib.parse import urlparse
 
-import requests
+import aiofiles
+import aiohttp
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
-from bs4 import BeautifulSoup
+from unidecode import unidecode
+from youtubesearchpython.__future__ import VideosSearch
 
-NAME = "ADDA X MUSIC"
+from AdnanXMusic import app
+from config import YOUTUBE_IMG_URL
 
 
 def get_thumb(url):
@@ -140,19 +138,5 @@ def edit(image_title, video_id, duration, views, channel):
         image.show()  # Display the edited image
         image.save(f"assets/{video_id}_edited.png")
     except Exception as e:
-        print(f"Error occurred while editing thumbnail: {e}")
-        print("» sᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ᴘʀᴏᴄᴇssɪɴɢ ʏᴏᴜʀ ǫᴜᴇʀʏ.\nᴇxᴄᴇᴘᴛɪᴏɴ : TypeError")
-
-
-def main():
-    url = input("Give Link: ")
-    img_filename = get_thumb(url)
-    if img_filename:
-        data = download_thumb(url)
-        if all(data):
-            edit(data[0], data[1], data[2], data[3], data[4])
-    else:
-        print("Thumbnail not available. Exiting...")
-
-if __name__ == "__main__":
-    main()
+        print(e)
+        return YOUTUBE_IMG_URL
