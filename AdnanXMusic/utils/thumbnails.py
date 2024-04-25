@@ -5,7 +5,7 @@ import aiofiles
 import aiohttp
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from unidecode import unidecode
-from youtubesearchpython.__future__ import VideosSearch
+from youtubesearchpython.future import VideosSearch
 
 from AdnanXMusic import app
 from config import YOUTUBE_IMG_URL
@@ -86,8 +86,30 @@ async def get_thumb(videoid):
             (255, 255, 255),
             font=font,
         )
-        overlay = Image.open("overlay.png")  # Load overlay image
-        background.paste(overlay, (55, 660), overlay)  # Paste overlay onto background image
+        draw.line(
+            [(55, 660), (1220, 660)],
+            fill="white",
+            width=5,
+            joint="curve",
+        )
+        draw.ellipse(
+            [(918, 648), (942, 672)],
+            outline="white",
+            fill="white",
+            width=15,
+        )
+        draw.text(
+            (50, 685),
+            "00:00",
+            (255, 255, 255),
+            font=arial,
+        )
+        draw.text(
+            (1185, 685),
+            f"{duration[:23]}",
+            (255, 255, 255),
+            font=AutourOne-Regular.ttf,
+        )
         try:
             os.remove(f"cache/thumb{videoid}.png")
         except:
