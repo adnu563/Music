@@ -17,16 +17,45 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 BOT_MENTION = "AdnanXMusic"
 
 def shorten_views(views):
-    # Existing code for shortening views...
+    try:
+        views = int(views)
+    except ValueError:
+        return views  # Return as it is if not convertible to int
+
+    if views < 1000:
+        return str(views)  # If less than 1000, return as it is
+
+    for unit in ["", "K", "M", "B"]:
+        if views < 1000.0:
+            return f"{views:.1f}{unit}" if unit else f"{views:.0f}"
+        views /= 1000.0
+    return f"{views:.1f}T"
 
 def fetch_spotify_track(query, spotify):
-    # Function to fetch track information from Spotify
-    # You need to implement this function to fetch track details from Spotify
-    pass
+    try:
+        # Search for the track using Spotify API
+        result = spotify.search(q=query, type='track', limit=1)
 
-def fetch_youtube_track(query):
-    # Function to fetch track information from YouTube
-    # You already have this implemented
+        # Extract relevant track information
+        track_info = {
+            'title': result['tracks']['items'][0]['name'],
+            'artist': result['tracks']['items'][0]['artists'][0]['name'],
+            'duration_ms': result['tracks']['items'][0]['duration_ms'],
+            'thumbnail': result['tracks']['items'][0]['album']['images'][0]['url'],
+            'spotify_url': result['tracks']['items'][0]['external_urls']['spotify']
+        }
+
+        return track_info
+
+    except SpotifyException as e:
+        # Handle Spotify API exceptions
+        LOGGER.error(f"Spotify API Error: {e}")
+        raise Exception("Failed to fetch track from Spotify")
+
+    except Exception as ex:
+        # Handle other exceptions
+        LOGGER.error(f"Error fetching track from Spotify: {ex}")
+        raise Exception("Failed to fetch track from Spotify")
 
 @app.on_message(filters.command(["song", "music"]))
 async def song(_, message: Message):
@@ -45,10 +74,35 @@ async def song(_, message: Message):
             track_info = fetch_spotify_track(query, spotify)
         else:
             # Fetch track information from YouTube
-            track_info = fetch_youtube_track(query)
+            results = YoutubeSearch(query, max_results=5).to_dict()
+            link = f"https://youtube.com{results[0]['url_suffix']}"
+            title = results[0]["title"][:40]
+            thumbnail = results[0]["thumbnails"][0]
+            thumb_name = f"thumb{title}.jpg"
+            thumb = requests.get(thumbnail, allow_redirects=True)
+            open(thumb_name, "wb").write(thumb.content)
+            duration = results[0]["duration"]
+            duration_formatted = shorten_views(duration)
+            singer = results[0]["channel"]
+            # Fetch total views using yt_dlp
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(link, download=False)
+                total_views = info_dict.get("view_count", "N/A")
+                total_views_short = shorten_views(total_views)
+            track_info = {
+                'title': title,
+                'duration': duration_formatted,
+                'thumbnail': thumbnail,
+                'singer': singer,
+                'total_views': total_views_short
+            }
 
         # Extract track details from the track_info
-        # title, duration, thumbnail, singer, total_views = ...
+        title = track_info['title']
+        duration = track_info['duration']
+        thumbnail = track_info['thumbnail']
+        singer = track_info['singer']
+        total_views = track_info['total_views']
 
     except Exception as ex:
         LOGGER.error(ex)
