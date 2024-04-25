@@ -3,7 +3,7 @@ import re
 
 import aiofiles
 import aiohttp
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from unidecode import unidecode
 from youtubesearchpython.__future__ import VideosSearch
 
@@ -66,11 +66,11 @@ async def get_thumb(videoid):
 
         youtube = Image.open(f"cache/thumb{videoid}.png")
         image1 = changeImageSize(1280, 720, youtube)
-        
+
         # Load overlay image
         overlay_path = "AdnanXMusic/assets/overly.png"
         overlay = Image.open(overlay_path)
-        
+
         # Resize overlay to fit YouTube thumbnail
         overlay = overlay.resize(image1.size)
 
@@ -122,13 +122,15 @@ async def get_thumb(videoid):
             (255, 255, 255),
             font=arial,
         )
-        
-        try:
-            os.remove(f"cache/thumb{videoid}.png")
-        except:
-            pass
-        background.save(f"cache/{videoid}.png")
-        return f"cache/{videoid}.png"
+
+        # Save the modified thumbnail
+        thumbnail_path = f"cache/{videoid}.png"
+        background.save(thumbnail_path)
+
+        # Clean up temporary files
+        os.remove(f"cache/thumb{videoid}.png")
+
+        return thumbnail_path
     except Exception as e:
         print(e)
         return YOUTUBE_IMG_URL
