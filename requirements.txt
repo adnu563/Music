@@ -23,15 +23,3 @@ unidecode
 yt-dlp
 youtube-search
 youtube-search-python
-python-telegram-bot
-pyTelegramBotAPI
-openai
-telebot
-beautifulsoup4
-aiogram
-Dispatcher
-urllib3
-utils
-thumbnails
-get_thumb
-partially
