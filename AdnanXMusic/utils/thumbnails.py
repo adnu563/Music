@@ -8,9 +8,9 @@ from urllib.parse import urlparse
 import requests
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from bs4 import BeautifulSoup
+import json
 
 from config import YOUTUBE_IMG_URL
-
 
 def get_thumb(url):
     try:
@@ -91,7 +91,7 @@ def edit(image_title, video_id, duration, views, channel):
         image = Image.alpha_composite(image.convert("RGBA"), overlay)
         draw = ImageDraw.Draw(image)
 
-        font = ImageFont.truetype("assets/font.ttf", 30)
+        font = ImageFont.truetype("arial.ttf", 30)
         text_color = (255, 255, 255)
 
         position = (30, 30)
@@ -132,5 +132,12 @@ def edit(image_title, video_id, duration, views, channel):
         return None
 
 if __name__ == "__main__":
-    # Add your code to execute the functions here
-    pass
+    # Example usage:
+    youtube_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"  # Example YouTube URL
+    thumbnail_path = get_thumb(youtube_url)
+    if thumbnail_path:
+        image_title, video_id, duration, views, channel_name = download_thumb(youtube_url)
+        if image_title and video_id and duration and views and channel_name:
+            edit(image_title, video_id, duration, views, channel_name)
+    else:
+        print("Thumbnail could not be retrieved.")
