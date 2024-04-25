@@ -71,9 +71,15 @@ async def song(_, message: Message):
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
         if "open.spotify.com" in query:
+            if not sp:
+                raise ValueError("Spotify client not initialized")
+            
             if "track" in query:
                 track_id = query.split("/")[-1]
                 track_info = sp.track(track_id)
+                if not track_info:
+                    raise ValueError("Invalid track ID or track not found")
+                
                 title = track_info["name"]
                 artist = track_info["artists"][0]["name"]
                 duration_ms = track_info["duration_ms"]
@@ -124,7 +130,8 @@ async def song(_, message: Message):
                 audio_file = ydl.prepare_filename(info_dict)
                 ydl.process_info(info_dict)
             bot_username = (await app.get_me()).username
-            rep = f"<b>➠ ᴛɪᴛʟᴇ:</b> {title[:20]}\n<b>➠ ᴅᴜʀᴀᴛɪᴏɴ:</b> {duration_formatted}\n<b>➠ ᴛᴏᴛᴀʟ ᴠɪᴇᴡs:</b> {total_views_short}\n\n<b>➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ:</b> @{bot_username}"
+            app_name = app.dc.config.app_name if app.dc.config.app_name else "YourAppName"
+            rep = f"<b>➠ ᴛɪᴛʟᴇ:</b> {title[:20]}\n<b>➠ ᴅᴜʀᴀᴛɪᴏɴ:</b> {duration_formatted}\n<b>➠ ᴛᴏᴛᴀʟ ᴠɪᴇᴡs:</b> {total_views_short}\n\n<b>➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ:</b> {app_name} (@{bot_username})"
             secmul, dur, dur_arr = 1, 0, duration.split(":")
             for i in range(len(dur_arr) - 1, -1, -1):
                 dur += int(dur_arr[i]) * secmul
