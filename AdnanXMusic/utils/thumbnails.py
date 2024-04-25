@@ -86,30 +86,8 @@ async def get_thumb(videoid):
             (255, 255, 255),
             font=font,
         )
-        draw.line(
-            [(55, 660), (1220, 660)], # Adjusted y-coordinate slightly
-            fill="white",
-            width=5,
-            joint="curve",
-        )
-        draw.ellipse(
-            [(918, 648), (942, 672)], # Adjusted y-coordinate to bring it to the top line at minute 00:00
-            outline="white",
-            fill="white",
-            width=15,
-        )
-        draw.text(
-            (36, 685), # Adjusted x-coordinate to move it to the left
-            "00:00",
-            (255, 255, 255),
-            font=arial,
-        )
-        draw.text(
-            (26, 685), # Adjusted x-coordinate to move it to the left
-            f"{duration[:23]}",
-            (255, 255, 255),
-            font=ImageFont.truetype("AdnanXMusic/assets/AutourOne-Regular.ttf", 30),
-        )
+        overlay = Image.open("overlay.png")  # Load overlay image
+        background.paste(overlay, (55, 660), overlay)  # Paste overlay onto background image
         try:
             os.remove(f"cache/thumb{videoid}.png")
         except:
