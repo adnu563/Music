@@ -85,7 +85,12 @@ def download_thumb(url):
 def edit(image_title, video_id, duration, views, channel):
     # Function to edit thumbnail
     try:
-        image = Image.open(f"assets/{video_id}.jpg")
+        image_path = f"assets/{video_id}.jpg"
+        if not os.path.exists(image_path):
+            print(f"Error: Image file '{image_path}' not found.")
+            return
+
+        image = Image.open(image_path)
         converter = ImageEnhance.Color(image)
         image = image.filter(ImageFilter.BLUR)
         overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
@@ -132,7 +137,7 @@ def edit(image_title, video_id, duration, views, channel):
         paste_position = (x - 80, y - 50)
         image.paste(image_to_paste, paste_position, image_to_paste)
 
-        # image.show()  # Comment out image.show()
+        image.show()  # Display the edited image
         image.save(f"assets/{video_id}_edited.png")
     except Exception as e:
         print(f"Error occurred while editing thumbnail: {e}")
