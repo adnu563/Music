@@ -2,7 +2,7 @@ import os
 import requests
 import yt_dlp
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 import logging
@@ -69,7 +69,14 @@ async def song(_, message: Message):
 
         await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
         try:
-            ydl_opts = {"format": "best[height=1080]"}
+            ydl_opts = {
+                'format': 'bestvideo[height<=2160]+bestaudio/best[height<=2160]',
+                'postprocessors': [{
+                    'key': 'FFmpegVideoConvertor',
+                    'preferedformat': 'mp4',
+                    'preferedquality': '720p',
+                }],
+            }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
                 video_file = ydl.prepare_filename(info_dict)
@@ -92,18 +99,13 @@ async def song(_, message: Message):
             except Exception as e:
                 LOGGER.error(e)
                 return await m.edit_text("Failed to send video.")
-        except yt_dlp.utils.DownloadError as e:
+        except Exception as e:
             LOGGER.error(e)
-            return await m.edit_text("Failed to download and upload video. No suitable format available.")
+            return await m.edit_text("Failed to download and upload video.")
 
         try:
             if os.path.exists(video_file):
-                await app.send_document(
-                    chat_id=message.chat.id,
-                    document=video_file,
-                    caption=rep
-                )
-                os.remove(video_file)  # Remove the downloaded video file
+                os.remove(video_file)
             if os.path.exists(thumb_name):
                 os.remove(thumb_name)
         except Exception as ex:
