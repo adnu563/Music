@@ -140,4 +140,8 @@ def get_thumb(videoid):
         response = requests.get(url)
         if response.status_code == 200:
             thumbnail_link = response.json()['items'][0]['snippet']['thumbnails']['maxres']['url']
-            thumbnail_filename, _ = urllib.request.urlretrieve(thumbnail_link, f"assets/{videoid}.
+            thumbnail_filename, _ = urllib.request.urlretrieve(thumbnail_link, f"assets/{videoid}.png")
+            return thumbnail_filename
+    except Exception as e:
+        print(e)
+        return YOUTUBE_IMG_URL
