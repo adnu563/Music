@@ -8,7 +8,8 @@ from datetime import timedelta
 import requests
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from bs4 import BeautifulSoup
-from import logging
+import logging
+
 NAME = "app.name"
 
 
