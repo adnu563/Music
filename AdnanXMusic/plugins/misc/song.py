@@ -8,6 +8,7 @@ from AdnanXMusic import app
 import logging
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.exceptions import SpotifyException
 
 # Initialize the LOGGER object
 LOGGER = logging.getLogger(__name__)
@@ -53,15 +54,30 @@ async def song(_, message: Message):
     query = "".join(" " + str(i) for i in message.command[1:])
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
-        # Check if the query is a Spotify link
         if "open.spotify.com" in query:
-            track_info = sp.track(query)
-            title = track_info["name"]
-            artist = track_info["artists"][0]["name"]
-            duration_ms = track_info["duration_ms"]
-            duration_formatted = shorten_views(duration_ms // 1000)
-            total_views_short = "N/A"  # Spotify doesn't provide view count
-            # You can proceed with downloading the Spotify track here
+            if "track" in query:
+                # Extract track ID from the Spotify track URL
+                track_id = query.split("/")[-1]
+                track_info = sp.track(track_id)
+                title = track_info["name"]
+                artist = track_info["artists"][0]["name"]
+                duration_ms = track_info["duration_ms"]
+                duration_formatted = shorten_views(duration_ms // 1000)
+                total_views_short = "N/A"  # Spotify doesn't provide view count
+                # You can proceed with downloading the Spotify track here
+            elif "album" in query:
+                # Extract album ID from the Spotify album URL
+                album_id = query.split("/")[-1]
+                album_info = sp.album(album_id)
+                # You can fetch information about album and its tracks
+            elif "playlist" in query:
+                # Extract playlist ID from the Spotify playlist URL
+                playlist_id = query.split("/")[-1]
+                playlist_info = sp.playlist(playlist_id)
+                # You can fetch information about playlist and its tracks
+            else:
+                raise ValueError("Unsupported Spotify URL/URI")
+
         else:
             results = YoutubeSearch(query, max_results=5).to_dict()
             link = f"https://youtube.com{results[0]['url_suffix']}"
@@ -78,7 +94,7 @@ async def song(_, message: Message):
                 info_dict = ydl.extract_info(link, download=False)
                 total_views = info_dict.get("view_count", "N/A")
                 total_views_short = shorten_views(total_views)
-    except Exception as ex:
+    except (ValueError, SpotifyException) as ex:
         LOGGER.error(ex)
         return await m.edit_text(
             f"<b>Failed to fetch track from YouTube/Spotify.\n●ʀᴇᴀsᴏɴ:</b> `{ex}`"
