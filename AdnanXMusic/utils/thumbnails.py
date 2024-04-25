@@ -8,7 +8,7 @@ from datetime import timedelta
 import requests
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from bs4 import BeautifulSoup
-
+from import logging
 NAME = "app.name"
 
 
@@ -66,7 +66,7 @@ def download_thumb(url):
 
 def edit(image_title, video_id, duration, views, channel):
     # Function to edit thumbnail
-    if image_title and video_id and duration and views and channel:
+    if all(param is not None for param in [image_title, video_id, duration, views, channel]):
         try:
             image = Image.open(f"AdnanXMusic/cache/{video_id}.jpg")
             converter = ImageEnhance.Color(image)
@@ -130,7 +130,7 @@ def get_thumb(videoid):
     url = f'https://www.youtube.com/watch?v={videoid}'
     data = download_thumb(url)
     if data:
-        done_image = edit(data[0], data[1], data[2], data[3], data[4])
+        done_image = edit(*data)
         return done_image 
     else:
         return None
