@@ -92,9 +92,9 @@ async def song(_, message: Message):
             except Exception as e:
                 LOGGER.error(e)
                 return await m.edit_text("Failed to send video.")
-        except Exception as e:
+        except yt_dlp.utils.DownloadError as e:
             LOGGER.error(e)
-            return await m.edit_text("Failed to download and upload video.")
+            return await m.edit_text("Failed to download and upload video. No suitable format available.")
 
         try:
             if os.path.exists(video_file):
