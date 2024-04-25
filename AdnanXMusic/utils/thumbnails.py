@@ -1,37 +1,42 @@
 import os
 import re
+
 import aiofiles
 import aiohttp
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from unidecode import unidecode
-from youtubesearchpython import VideosSearch
+from youtubesearchpython.__future__ import VideosSearch
+
 from AdnanXMusic import app
 from config import YOUTUBE_IMG_URL
 
-async def change_image_size(max_width, max_height, image):
-    width_ratio = max_width / image.size[0]
-    height_ratio = max_height / image.size[1]
-    new_width = int(width_ratio * image.size[0])
-    new_height = int(height_ratio * image.size[1])
-    new_image = image.resize((new_width, new_height))
-    return new_image
+
+def changeImageSize(maxWidth, maxHeight, image):
+    widthRatio = maxWidth / image.size[0]
+    heightRatio = maxHeight / image.size[1]
+    newWidth = int(widthRatio * image.size[0])
+    newHeight = int(heightRatio * image.size[1])
+    newImage = image.resize((newWidth, newHeight))
+    return newImage
+
 
 def clear(text):
-    words = text.split(" ")
+    list = text.split(" ")
     title = ""
-    for word in words:
-        if len(title) + len(word) < 60:
-            title += " " + word
+    for i in list:
+        if len(title) + len(i) < 60:
+            title += " " + i
     return title.strip()
 
+
 async def get_thumb(videoid):
-    if os.path.isfile(f"AdnanXMusic/assets/{videoid}.png"):
-        return f"AdnanXMusic/assets/{videoid}.png"
+    if os.path.isfile(f"cache/{videoid}.png"):
+        return f"cache/{videoid}.png"
 
     url = f"https://www.youtube.com/watch?v={videoid}"
     try:
         results = VideosSearch(url, limit=1)
-        for result in await results.next():
+        for result in (await results.next())["result"]:
             try:
                 title = result["title"]
                 title = re.sub("\W+", " ", title)
@@ -55,11 +60,24 @@ async def get_thumb(videoid):
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail) as resp:
                 if resp.status == 200:
-                    async with aiofiles.open(f"AdnanXMusic/assets/thumb{videoid}.png", mode="wb") as f:
-                        await f.write(await resp.read())
+                    f = await aiofiles.open(f"cache/thumb{videoid}.png", mode="wb")
+                    await f.write(await resp.read())
+                    await f.close()
 
-        youtube = Image.open(f"AdnanXMusic/assets/thumb{videoid}.png")
-        image1 = await change_image_size(1280, 720, youtube)
+        youtube = Image.open(f"cache/thumb{videoid}.png")
+        image1 = changeImageSize(1280, 720, youtube)
+        
+        # Load overlay image
+        overlay_path = "AdnanXMusic/assets/overly.png"
+        overlay = Image.open(overlay_path)
+        
+        # Resize overlay to fit YouTube thumbnail
+        overlay = overlay.resize(image1.size)
+
+        # Paste overlay onto the thumbnail
+        image1.paste(overlay, (0, 0), overlay)
+
+        # Add the rest of your code to draw text, lines, etc...
         image2 = image1.convert("RGBA")
         background = image2.filter(filter=ImageFilter.BoxBlur(10))
         enhancer = ImageEnhance.Brightness(background)
@@ -67,23 +85,50 @@ async def get_thumb(videoid):
         draw = ImageDraw.Draw(background)
         arial = ImageFont.truetype("AdnanXMusic/assets/font2.ttf", 30)
         font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
-        draw.text((20, 8), unidecode(app.name), fill="white", font=arial)  # Adjusted x-coordinate
-        draw.text((55, 560), f"{channel} | {views[:23]}", (255, 255, 255), font=arial)
-        draw.text((57, 600), clear(title), (255, 255, 255), font=font)
-        draw.text((36, 685), "00:00", (255, 255, 255), font=arial)
-        draw.text((1185, 685), f"{duration[:23]}", (255, 255, 255), font=arial)
-
-        # Adding overlay image
-        overlay_path = "AdnanXMusic/assets/overly.png"
-        if os.path.exists(overlay_path):
-            overlay = Image.open(overlay_path)
-            background.paste(overlay, (0, 0), overlay)
-
-        os.remove(f"AdnanXMusic/assets/thumb{videoid}.png")
-
-        background.save(f"AdnanXMusic/assets/{videoid}.png")
-        return f"AdnanXMusic/assets/{videoid}.png"
-    except Exception as e:
-        print(f"Error generating thumbnail: {e}")
-        return YOUTUBE_IMG_URL
+        draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
+        draw.text(
+            (55, 560),
+            f"{channel} | {views[:23]}",
+            (255, 255, 255),
+            font=arial,
+        )
+        draw.text(
+            (57, 600),
+            clear(title),
+            (255, 255, 255),
+            font=font,
+        )
+        draw.line(
+            [(55, 660), (1220, 660)],
+            fill="white",
+            width=5,
+            joint="curve",
+        )
+        draw.ellipse(
+            [(918, 648), (942, 672)],
+            outline="white",
+            fill="white",
+            width=15,
+        )
+        draw.text(
+            (36, 685),
+            "00:00",
+            (255, 255, 255),
+            font=arial,
+        )
+        draw.text(
+            (1185, 685),
+            f"{duration[:23]}",
+            (255, 255, 255),
+            font=arial,
+        )
         
+        try:
+            os.remove(f"cache/thumb{videoid}.png")
+        except:
+            pass
+        background.save(f"cache/{videoid}.png")
+        return f"cache/{videoid}.png"
+    except Exception as e:
+        print(e)
+        return YOUTUBE_IMG_URL
