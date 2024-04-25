@@ -2,10 +2,11 @@ import os
 import requests
 import yt_dlp
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 from spotipy import Spotify, SpotifyException
+from spotipy.oauth2 import SpotifyClientCredentials
 import logging
 
 # Initialize the LOGGER object
@@ -16,8 +17,9 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 
 BOT_MENTION = "AdnanXMusic"
 
-# Fetch Spotify API key from environment variable
-spotify_api_key = os.environ.get("SPOTIFY_API_KEY")
+# Fetch Spotify client ID and client secret from environment variables
+spotify_client_id = os.environ.get("20ecc58f14f2456fa7fe495d1f1f2c5f")
+spotify_client_secret = os.environ.get("5d324c2fe30641ac871ed55788b373c9")
 
 def shorten_views(views):
     try:
@@ -73,7 +75,8 @@ async def song(_, message: Message):
         # Check if the query is a Spotify URL
         if "spotify.com" in query:
             # Fetch track information from Spotify
-            spotify = Spotify(auth=spotify_api_key)
+            auth_manager = SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret)
+            spotify = Spotify(auth_manager=auth_manager)
             track_info = fetch_spotify_track(query, spotify)
         else:
             # Fetch track information from YouTube
@@ -88,6 +91,12 @@ async def song(_, message: Message):
             duration_formatted = shorten_views(duration)
             singer = results[0]["channel"]
             # Fetch total views using yt_dlp
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'extractaudio': True,
+                'audioformat': 'mp3',
+                'outtmpl': '%(title)s.%(ext)s',
+            }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=False)
                 total_views = info_dict.get("view_count", "N/A")
