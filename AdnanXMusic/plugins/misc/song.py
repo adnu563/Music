@@ -9,11 +9,6 @@ import logging
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-# Initialize the Spotify client
-spotify_client_id = "your_client_id"
-spotify_client_secret = "your_client_secret"
-sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret))
-
 # Initialize the LOGGER object
 LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +31,16 @@ def shorten_views(views):
             return f"{views:.1f}{unit}" if unit else f"{views:.0f}"
         views /= 1000.0
     return f"{views:.1f}T"
+
+def initialize_spotify():
+    # Initialize Spotify client
+    spotify_client_id = "your_client_id"
+    spotify_client_secret = "your_client_secret"
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret))
+    return sp
+
+# Initialize Spotify client
+sp = initialize_spotify()
 
 @app.on_message(filters.command(["song", "music"]))
 async def song(_, message: Message):
