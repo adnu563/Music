@@ -18,8 +18,11 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 BOT_MENTION = "AdnanXMusic"
 
 # Fetch Spotify client ID and client secret from environment variables
-spotify_client_id = os.environ.get("20ecc58f14f2456fa7fe495d1f1f2c5f")
-spotify_client_secret = os.environ.get("5d324c2fe30641ac871ed55788b373c9")
+spotify_client_id = os.environ.get("SPOTIFY_CLIENT_ID")
+spotify_client_secret = os.environ.get("SPOTIFY_CLIENT_SECRET")
+
+# Set Spotipy client ID
+os.environ["SPOTIPY_CLIENT_ID"] = spotify_client_id
 
 def shorten_views(views):
     try:
