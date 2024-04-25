@@ -25,8 +25,8 @@ def clear(text):
     return title.strip()
 
 async def get_thumb(videoid):
-    if os.path.isfile(f"cache/{videoid}.png"):
-        return f"cache/{videoid}.png"
+    if os.path.isfile(f"AdnanXMusic/assets/{videoid}.png"):
+        return f"AdnanXMusic/assets/{videoid}.png"
 
     url = f"https://www.youtube.com/watch?v={videoid}"
     try:
@@ -55,10 +55,10 @@ async def get_thumb(videoid):
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail) as resp:
                 if resp.status == 200:
-                    async with aiofiles.open(f"cache/thumb{videoid}.png", mode="wb") as f:
+                    async with aiofiles.open(f"AdnanXMusic/assets/thumb{videoid}.png", mode="wb") as f:
                         await f.write(await resp.read())
 
-        youtube = Image.open(f"cache/thumb{videoid}.png")
+        youtube = Image.open(f"AdnanXMusic/assets/thumb{videoid}.png")
         image1 = await change_image_size(1280, 720, youtube)
         image2 = image1.convert("RGBA")
         background = image2.filter(filter=ImageFilter.BoxBlur(10))
@@ -79,10 +79,10 @@ async def get_thumb(videoid):
             overlay = Image.open(overlay_path)
             background.paste(overlay, (0, 0), overlay)
 
-        os.remove(f"cache/thumb{videoid}.png")
+        os.remove(f"AdnanXMusic/assets/thumb{videoid}.png")
 
-        background.save(f"cache/{videoid}.png")
-        return f"cache/{videoid}.png"
+        background.save(f"AdnanXMusic/assets/{videoid}.png")
+        return f"AdnanXMusic/assets/{videoid}.png"
     except Exception as e:
         print(f"Error generating thumbnail: {e}")
         return YOUTUBE_IMG_URL
