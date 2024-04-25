@@ -2,7 +2,7 @@ import os
 import requests
 import yt_dlp
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 import logging
@@ -98,7 +98,12 @@ async def song(_, message: Message):
 
         try:
             if os.path.exists(video_file):
-                os.remove(video_file)
+                await app.send_document(
+                    chat_id=message.chat.id,
+                    document=video_file,
+                    caption=rep
+                )
+                os.remove(video_file)  # Remove the downloaded video file
             if os.path.exists(thumb_name):
                 os.remove(thumb_name)
         except Exception as ex:
