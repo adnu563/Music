@@ -73,7 +73,7 @@ async def get_thumb(videoid):
         draw = ImageDraw.Draw(background)
         arial = ImageFont.truetype("AdnanXMusic/assets/AutourOne-Regular.ttf", 30)
         font = ImageFont.truetype("AdnanXMusic/assets/AutourOne-Regular.ttf", 30)
-        draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
+        draw.text(220, 8), unidecode(app.name), fill="white", font=arial)
         draw.text(
             (55, 560),
             f"{channel} | {views[:23]}",
@@ -108,7 +108,7 @@ async def get_thumb(videoid):
             (1185, 685),
             f"{duration[:23]}",
             (255, 255, 255),
-            font=AutourOne-Regular.ttf,
+            font=arial,
         )
         try:
             os.remove(f"cache/thumb{videoid}.png")
