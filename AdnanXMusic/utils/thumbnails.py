@@ -86,3 +86,4 @@ async def get_thumb(videoid):
     except Exception as e:
         print(f"Error generating thumbnail: {e}")
         return YOUTUBE_IMG_URL
+        
