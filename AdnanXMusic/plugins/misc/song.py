@@ -2,13 +2,12 @@ import os
 import requests
 import yt_dlp
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
 import logging
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-from spotipy.exceptions import SpotifyException
 
 # Initialize the LOGGER object
 LOGGER = logging.getLogger(__name__)
@@ -33,11 +32,28 @@ def shorten_views(views):
         views /= 1000.0
     return f"{views:.1f}T"
 
+def find_spotify_config():
+    # Define possible file names for Spotify API configuration file
+    possible_filenames = ['spotify_config.cfg', 'spotify_credentials.cfg', 'spotify_config.json']
+
+    # Search for the configuration file in predefined locations or in the current directory
+    for filename in possible_filenames:
+        if os.path.exists(filename):
+            return filename
+    return None
+
 def initialize_spotify():
-    # Initialize Spotify client
-    spotify_client_id = "your_client_id"
-    spotify_client_secret = "your_client_secret"
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret))
+    # Find the Spotify API configuration file
+    config_file = find_spotify_config()
+
+    if config_file:
+        # Initialize Spotify client using the found configuration file
+        sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials.from_config_file(config_file))
+    else:
+        # Log an error if the configuration file is not found
+        LOGGER.error("Spotify API configuration file not found.")
+        return None
+
     return sp
 
 # Initialize Spotify client
@@ -51,12 +67,11 @@ async def song(_, message: Message):
         pass
     m = await message.reply_text("🔎")
 
-    query = "".join(" " + str(i) for i in message.command[1:])
+    query = " ".join(message.command[1:])
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
         if "open.spotify.com" in query:
             if "track" in query:
-                # Extract track ID from the Spotify track URL
                 track_id = query.split("/")[-1]
                 track_info = sp.track(track_id)
                 title = track_info["name"]
@@ -64,17 +79,15 @@ async def song(_, message: Message):
                 duration_ms = track_info["duration_ms"]
                 duration_formatted = shorten_views(duration_ms // 1000)
                 total_views_short = "N/A"  # Spotify doesn't provide view count
-                # You can proceed with downloading the Spotify track here
+                # Proceed with downloading the Spotify track here
             elif "album" in query:
-                # Extract album ID from the Spotify album URL
                 album_id = query.split("/")[-1]
                 album_info = sp.album(album_id)
-                # You can fetch information about album and its tracks
+                # Proceed with fetching album information
             elif "playlist" in query:
-                # Extract playlist ID from the Spotify playlist URL
                 playlist_id = query.split("/")[-1]
                 playlist_info = sp.playlist(playlist_id)
-                # You can fetch information about playlist and its tracks
+                # Proceed with fetching playlist information
             else:
                 raise ValueError("Unsupported Spotify URL/URI")
 
@@ -94,7 +107,7 @@ async def song(_, message: Message):
                 info_dict = ydl.extract_info(link, download=False)
                 total_views = info_dict.get("view_count", "N/A")
                 total_views_short = shorten_views(total_views)
-    except (ValueError, SpotifyException) as ex:
+    except (ValueError, spotipy.SpotifyException) as ex:
         LOGGER.error(ex)
         return await m.edit_text(
             f"<b>Failed to fetch track from YouTube/Spotify.\n●ʀᴇᴀsᴏɴ:</b> `{ex}`"
