@@ -12,7 +12,7 @@ import requests
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from bs4 import BeautifulSoup
 
-NAME = app.name
+NAME = "app.name"
 
 
 def get_duration(response):
@@ -58,14 +58,14 @@ def download_thumb(url):
     image_link = (response.split('<link rel="image_src" href="'))[1].split('">')[0]
     image_name = image_link.split('vi/')[1].split('/')[0]
 
-    img_filename, _ = urllib.request.urlretrieve(image_link, f"cache/{image_name}.jpg")
+    img_filename, _ = urllib.request.urlretrieve(image_link, f"AdnanXMusic/cache/{image_name}.jpg")
     img = Image.open(img_filename)
     return image_title, image_name, duration, views, channel_name
 
 
 def edit(image_title, video_id, duration, views, channel):
     # Function to edit thumbnail
-    image = Image.open(f"cache/{video_id}.jpg")
+    image = Image.open(f"AdnanXMusic/cache/{video_id}.jpg")
     converter = ImageEnhance.Color(image)
     image = image.filter(ImageFilter.BLUR)
     overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
@@ -73,7 +73,7 @@ def edit(image_title, video_id, duration, views, channel):
     draw = ImageDraw.Draw(image)
 
     # Fonts And Color
-    font = ImageFont.truetype("assets/font.ttf", 30)
+    font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
     text_color = (255, 255, 255)
 
     # Top Left Sight Writing
@@ -107,13 +107,13 @@ def edit(image_title, video_id, duration, views, channel):
     # Overlay Image
     overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
     image = Image.alpha_composite(image.convert("RGBA"), overlay)
-    image_to_paste = Image.open("overlay.png")
+    image_to_paste = Image.open("AdnanXMusic/cache/overlay.png")
     image_to_paste = image_to_paste.convert("RGBA")
     paste_position = (x - 80, y - 50)
     image.paste(image_to_paste, paste_position, image_to_paste)
 
     # image.show()
-    image.save(f"cache/{video_id}_edited.png")
+    image.save(f"AdnanXMusic/cache/{video_id}_edited.png")
     return f"assets/{video_id}_edited.png"
 
 
@@ -121,4 +121,4 @@ def get_thumb(videoid):
     url = f'https://www.youtube.com/watch?v={videoid}'
     data = download_thumb(url)
     done_image = edit(data[0], data[1], data[2], data[3], data[4])
-    return done_image
+    return done_image 
