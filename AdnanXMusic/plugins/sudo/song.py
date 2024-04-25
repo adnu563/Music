@@ -69,14 +69,7 @@ async def song(_, message: Message):
 
         await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
         try:
-            ydl_opts = {
-                'format': 'bestvideo[height<=2160]+bestaudio/best[height<=2160]',
-                'postprocessors': [{
-                    'key': 'FFmpegVideoConvertor',
-                    'preferedformat': 'mp4',
-                    'preferedquality': '720p',
-                }],
-            }
+            ydl_opts = {"format": "best"}
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(link, download=True)
                 video_file = ydl.prepare_filename(info_dict)
