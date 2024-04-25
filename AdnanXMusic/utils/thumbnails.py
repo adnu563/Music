@@ -1,13 +1,14 @@
 import os
 import re
+import textwrap
+import urllib.request
+from datetime import timedelta
+from urllib.parse import urlparse
 
-import aiofiles
-import aiohttp
+import requests
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
-from unidecode import unidecode
-from youtubesearchpython.__future__ import VideosSearch
+from bs4 import BeautifulSoup
 
-from AdnanXMusic import app
 from config import YOUTUBE_IMG_URL
 
 
@@ -29,7 +30,6 @@ def get_thumb(url):
 
 
 def get_duration(response):
-    # Function to extract video duration
     soup = BeautifulSoup(response, 'html.parser')
     script_tag = soup.find('script', text=re.compile('ytInitialPlayerResponse'))
     if script_tag:
@@ -44,13 +44,11 @@ def get_duration(response):
 
 
 def get_views(response):
-    # Function to extract views count
     views = response.split('"shortViewCount":{"simpleText":"')[1].split('"}')[0]
     return views
 
 
 def get_middle(duration):
-    # Function to get the middle of the video duration
     minute = int(int(duration[1]) / 2)
     if minute < 10:
         minute = f"0{minute}"
@@ -62,7 +60,6 @@ def get_middle(duration):
 
 def download_thumb(url):
     try:
-        # Function to download thumbnail
         response = requests.get(url).text
         image_title = response.split('<meta name="title" content="')[1].split('">')[0]
         duration = get_duration(response)
@@ -81,7 +78,6 @@ def download_thumb(url):
 
 
 def edit(image_title, video_id, duration, views, channel):
-    # Function to edit thumbnail
     try:
         image_path = f"assets/{video_id}.jpg"
         if not os.path.exists(image_path):
@@ -95,25 +91,20 @@ def edit(image_title, video_id, duration, views, channel):
         image = Image.alpha_composite(image.convert("RGBA"), overlay)
         draw = ImageDraw.Draw(image)
 
-        # Fonts And Color
         font = ImageFont.truetype("assets/font.ttf", 30)
         text_color = (255, 255, 255)
 
-        # Top Left Sight Writing
         position = (30, 30)
-        draw.text(position, NAME, fill=text_color, font=font)
+        draw.text(position, channel, fill=text_color, font=font)
 
-        # Bottom X Y Value
         image_width, image_height = image.size
         x = ((image_width // 2) // 2)
         y = (image_height // 2) + (image_height // 4)
 
-        # Title OF The Video
         position = (x, y - 80)
         text = textwrap.fill(f"{image_title}", width=50)
         draw.text(position, text, fill=text_color, font=font)
 
-        # Duration Start And Close
         if duration:
             duritionX = duration.split(":")
             middle_duration = get_middle(duritionX)
@@ -127,7 +118,6 @@ def edit(image_title, video_id, duration, views, channel):
         draw.text((x + 150, y + 125), f"{channel} | {views}", fill=text_color,
                   font=ImageFont.truetype("arial.ttf", 20))
 
-        # Overlay Image
         overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
         image = Image.alpha_composite(image.convert("RGBA"), overlay)
         image_to_paste = Image.open("overlay.png")
@@ -135,8 +125,12 @@ def edit(image_title, video_id, duration, views, channel):
         paste_position = (x - 80, y - 50)
         image.paste(image_to_paste, paste_position, image_to_paste)
 
-        image.show()  # Display the edited image
+        image.show()
         image.save(f"assets/{video_id}_edited.png")
     except Exception as e:
         print(e)
-        return YOUTUBE_IMG_URL
+        return None
+
+if __name__ == "__main__":
+    # Add your code to execute the functions here
+    pass
