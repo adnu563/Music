@@ -5,9 +5,6 @@ import urllib.request
 import json
 from datetime import timedelta
 
-from AdnanXMusic import app
-
-
 import requests
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from bs4 import BeautifulSoup
@@ -65,60 +62,67 @@ def download_thumb(url):
 
 def edit(image_title, video_id, duration, views, channel):
     # Function to edit thumbnail
-    image = Image.open(f"AdnanXMusic/cache/{video_id}.jpg")
-    converter = ImageEnhance.Color(image)
-    image = image.filter(ImageFilter.BLUR)
-    overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
-    image = Image.alpha_composite(image.convert("RGBA"), overlay)
-    draw = ImageDraw.Draw(image)
+    try:
+        image = Image.open(f"AdnanXMusic/cache/{video_id}.jpg")
+        converter = ImageEnhance.Color(image)
+        image = image.filter(ImageFilter.BLUR)
+        overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
+        image = Image.alpha_composite(image.convert("RGBA"), overlay)
+        draw = ImageDraw.Draw(image)
 
-    # Fonts And Color
-    font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
-    text_color = (255, 255, 255)
+        # Fonts And Color
+        font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
+        text_color = (255, 255, 255)
 
-    # Top Left Sight Writing
-    position = (30, 30)
-    draw.text(position, NAME, fill=text_color, font=font)
+        # Top Left Sight Writing
+        position = (30, 30)
+        draw.text(position, NAME, fill=text_color, font=font)
 
-    # Bottom X Y Value
-    image_width, image_height = image.size
-    x = ((image_width // 2) // 2)
-    y = (image_height // 2) + (image_height // 4)
+        # Bottom X Y Value
+        image_width, image_height = image.size
+        x = ((image_width // 2) // 2)
+        y = (image_height // 2) + (image_height // 4)
 
-    # Title OF The Video
-    position = (x, y - 80)
-    text = textwrap.fill(f"{image_title}", width=50)
-    draw.text(position, text, fill=text_color, font=font)
+        # Title OF The Video
+        position = (x, y - 80)
+        text = textwrap.fill(f"{image_title}", width=50)
+        draw.text(position, text, fill=text_color, font=font)
 
-    # Duration Start And Close
-    if duration:
-        duritionX = duration.split(":")
-        middle_duration = get_middle(duritionX)
-        position = (x - 200, y)
-        draw.text(position, middle_duration, fill=text_color, font=font)
+        # Duration Start And Close
+        if duration:
+            duritionX = duration.split(":")
+            middle_duration = get_middle(duritionX)
+            position = (x - 200, y)
+            draw.text(position, middle_duration, fill=text_color, font=font)
 
-        full_duration = f"{duritionX[1]} : {duritionX[2]}"
-        position = (x - 80 + 800, y)
-        draw.text(position, full_duration, fill=text_color, font=font)
+            full_duration = f"{duritionX[1]} : {duritionX[2]}"
+            position = (x - 80 + 800, y)
+            draw.text(position, full_duration, fill=text_color, font=font)
 
-    draw.text((x + 150, y + 125), f"{channel} | {views}", fill=text_color,
-              font=ImageFont.truetype("arial.ttf", 20))
+        draw.text((x + 150, y + 125), f"{channel} | {views}", fill=text_color,
+                  font=ImageFont.truetype("arial.ttf", 20))
 
-    # Overlay Image
-    overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
-    image = Image.alpha_composite(image.convert("RGBA"), overlay)
-    image_to_paste = Image.open("AdnanXMusic/cache/overlay.png")
-    image_to_paste = image_to_paste.convert("RGBA")
-    paste_position = (x - 80, y - 50)
-    image.paste(image_to_paste, paste_position, image_to_paste)
+        # Overlay Image
+        overlay = Image.new("RGBA", image.size, (50, 50, 50, 50))
+        image = Image.alpha_composite(image.convert("RGBA"), overlay)
+        image_to_paste = Image.open("AdnanXMusic/cache/overlay.png")
+        image_to_paste = image_to_paste.convert("RGBA")
+        paste_position = (x - 80, y - 50)
+        image.paste(image_to_paste, paste_position, image_to_paste)
 
-    # image.show()
-    image.save(f"AdnanXMusic/cache/{video_id}_edited.png")
-    return f"assets/{video_id}_edited.png"
+        # image.show()
+        image.save(f"AdnanXMusic/cache/{video_id}_edited.png")
+        return f"assets/{video_id}_edited.png"
+    except OSError as e:
+        print(f"Error: {e}")
+        return None
 
 
 def get_thumb(videoid):
     url = f'https://www.youtube.com/watch?v={videoid}'
     data = download_thumb(url)
-    done_image = edit(data[0], data[1], data[2], data[3], data[4])
-    return done_image 
+    if data:
+        done_image = edit(data[0], data[1], data[2], data[3], data[4])
+        return done_image 
+    else:
+        return None
