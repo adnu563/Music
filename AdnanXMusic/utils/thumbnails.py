@@ -67,7 +67,7 @@ async def get_thumb(videoid):
         draw = ImageDraw.Draw(background)
         arial = ImageFont.truetype("AdnanXMusic/assets/font2.ttf", 30)
         font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 30)
-        draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
+        draw.text((20, 8), unidecode(app.name), fill="white", font=arial)  # Adjusted x-coordinate
         draw.text((55, 560), f"{channel} | {views[:23]}", (255, 255, 255), font=arial)
         draw.text((57, 600), clear(title), (255, 255, 255), font=font)
         draw.text((36, 685), "00:00", (255, 255, 255), font=arial)
@@ -84,5 +84,5 @@ async def get_thumb(videoid):
         background.save(f"cache/{videoid}.png")
         return f"cache/{videoid}.png"
     except Exception as e:
-        print(e)
+        print(f"Error generating thumbnail: {e}")
         return YOUTUBE_IMG_URL
