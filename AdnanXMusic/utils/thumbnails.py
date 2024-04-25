@@ -105,10 +105,10 @@ async def get_thumb(videoid):
             font=arial,
         )
         draw.text(
-            (1110, 08),
+            (1110, 25),
             f"{duration[:23]}",
             (255, 255, 255),
-            font= ("AdnanXMusic/assets/AutourOne-Regular.ttf"),
+            font= "AdnanXMusic/assets/AutourOne-Regular.ttf",
         )
         try:
             os.remove(f"cache/thumb{videoid}.png")
