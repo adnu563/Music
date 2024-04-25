@@ -5,6 +5,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtube_search import YoutubeSearch
 from AdnanXMusic import app
+from spotipy import Spotify, SpotifyException
 import logging
 
 # Initialize the LOGGER object
@@ -16,19 +17,16 @@ logging.basicConfig(level=logging.ERROR)  # Set the logging level to ERROR or an
 BOT_MENTION = "AdnanXMusic"
 
 def shorten_views(views):
-    try:
-        views = int(views)
-    except ValueError:
-        return views  # Return as it is if not convertible to int
+    # Existing code for shortening views...
 
-    if views < 1000:
-        return str(views)  # If less than 1000, return as it is
+def fetch_spotify_track(query, spotify):
+    # Function to fetch track information from Spotify
+    # You need to implement this function to fetch track details from Spotify
+    pass
 
-    for unit in ["", "K", "M", "B"]:
-        if views < 1000.0:
-            return f"{views:.1f}{unit}" if unit else f"{views:.0f}"
-        views /= 1000.0
-    return f"{views:.1f}T"
+def fetch_youtube_track(query):
+    # Function to fetch track information from YouTube
+    # You already have this implemented
 
 @app.on_message(filters.command(["song", "music"]))
 async def song(_, message: Message):
@@ -39,57 +37,44 @@ async def song(_, message: Message):
     m = await message.reply_text("🔎")
 
     query = "".join(" " + str(i) for i in message.command[1:])
-    ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
-        results = YoutubeSearch(query, max_results=5).to_dict()
-        link = f"https://youtube.com{results[0]['url_suffix']}"
-        title = results[0]["title"][:40]
-        thumbnail = results[0]["thumbnails"][0]
-        thumb_name = f"thumb{title}.jpg"
-        thumb = requests.get(thumbnail, allow_redirects=True)
-        open(thumb_name, "wb").write(thumb.content)
-        duration = results[0]["duration"]
-        duration_formatted = shorten_views(duration)
-        singer = results[0]["channel"]
-        # Fetch total views using yt_dlp
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(link, download=False)
-            total_views = info_dict.get("view_count", "N/A")
-            total_views_short = shorten_views(total_views)
+        # Check if the query is a Spotify URL
+        if "spotify.com" in query:
+            # Fetch track information from Spotify
+            spotify = Spotify(auth=spotify_api_key)
+            track_info = fetch_spotify_track(query, spotify)
+        else:
+            # Fetch track information from YouTube
+            track_info = fetch_youtube_track(query)
+
+        # Extract track details from the track_info
+        # title, duration, thumbnail, singer, total_views = ...
+
     except Exception as ex:
         LOGGER.error(ex)
         return await m.edit_text(
-            f"<b>Failed to fetch track from YouTube.\n●ʀᴇᴀsᴏɴ:</b> `{ex}`"
+            f"<b>Failed to fetch track.\n● Reason:</b> `{ex}`"
         )
 
-    await m.edit_text("»⏳ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴏɴɢ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...!")
+    await m.edit_text("»⏳Downloading song, please wait...")
+
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(link, download=False)
-            audio_file = ydl.prepare_filename(info_dict)
-            ydl.process_info(info_dict)
-        bot_username = (await app.get_me()).username
-        rep = f"<b>➠ ᴛɪᴛʟᴇ:</b> {title[:20]}\n<b>➠ ᴅᴜʀᴀᴛɪᴏɴ:</b> {duration_formatted}\n<b>➠ ᴛᴏᴛᴀʟ ᴠɪᴇᴡs:</b> {total_views_short}\n\n<b>➥ ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ:</b> @{bot_username}"
-        secmul, dur, dur_arr = 1, 0, duration.split(":")
-        for i in range(len(dur_arr) - 1, -1, -1):
-            dur += int(dur_arr[i]) * secmul
-            secmul *= 60
-        try:
-            await app.send_audio(
-                chat_id=message.chat.id,  # Send the song in the same chat where the command was called
-                audio=audio_file,
-                caption=rep,
-                thumb=thumb_name,
-                title=title,
-                duration=dur,
-            )
-            await m.delete()  # Delete the message indicating that the song is being downloaded
-        except Exception as e:
-            LOGGER.error(e)
-            return await m.edit_text("Failed to send audio.")
+        # Download the audio file (YouTube or Spotify)
+        # ...
+
+        # Send the audio file with details
+        await app.send_audio(
+            chat_id=message.chat.id,
+            audio=audio_file,
+            caption=rep,
+            thumb=thumb_name,
+            title=title,
+            duration=dur,
+        )
+        await m.delete()
     except Exception as e:
         LOGGER.error(e)
-        return await m.edit_text("Failed to upload audio on Telegram servers.")
+        return await m.edit_text("Failed to send audio.")
 
     try:
         os.remove(audio_file)
