@@ -30,8 +30,8 @@ def clear(text):
 
 
 async def get_thumb(videoid):
-    if os.path.isfile(f"assets/{videoid}.png"):
-        return f"assets/{videoid}.png"
+    if os.path.isfile(f"cache/{videoid}.png"):
+        return f"cache/{videoid}.png"
 
     url = f"https://www.youtube.com/watch?v={videoid}"
     try:
@@ -60,11 +60,11 @@ async def get_thumb(videoid):
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail) as resp:
                 if resp.status == 200:
-                    f = await aiofiles.open(f"assets/thumb{videoid}.png", mode="wb")
+                    f = await aiofiles.open(f"cache/thumb{videoid}.png", mode="wb")
                     await f.write(await resp.read())
                     await f.close()
 
-        youtube = Image.open(f"assets/thumb{videoid}.png")
+        youtube = Image.open(f"cache/thumb{videoid}.png")
         image1 = changeImageSize(1280, 720, youtube)
         image2 = image1.convert("RGBA")
         background = image2.filter(filter=ImageFilter.BoxBlur(10))
@@ -111,11 +111,11 @@ async def get_thumb(videoid):
             font=arial,
         )
         try:
-            os.remove(f"assets/thumb{videoid}.png")
+            os.remove(f"cache/thumb{videoid}.png")
         except:
             pass
-        background.save(f"assets/{videoid}.png")
-        return f"assets/{videoid}.png"
+        background.save(f"cache/{videoid}.png")
+        return f"cache/{videoid}.png"
     except Exception as e:
         print(e)
         return YOUTUBE_IMG_URL
