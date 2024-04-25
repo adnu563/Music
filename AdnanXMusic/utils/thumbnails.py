@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from unidecode import unidecode
 from youtubesearchpython.__future__ import VideosSearch
 
-from AdnanXMusic import app
+from AnonXMusic import app
 from config import YOUTUBE_IMG_URL
 
 
@@ -87,19 +87,19 @@ async def get_thumb(videoid):
             font=font,
         )
         draw.line(
-            [(55, 660), (1220, 660)],
+            [(55, 665), (1220, 665)],  # Adjusted y-coordinate slightly
             fill="white",
             width=5,
             joint="curve",
         )
         draw.ellipse(
-            [(918, 648), (942, 672)],
+            [(918, 640), (942, 664)],  # Adjusted y-coordinate to bring it higher
             outline="white",
             fill="white",
             width=15,
         )
         draw.text(
-            (36, 685),
+            (26, 685),  # Adjusted x-coordinate to move it to the left
             "00:00",
             (255, 255, 255),
             font=arial,
@@ -108,7 +108,7 @@ async def get_thumb(videoid):
             (1185, 685),
             f"{duration[:23]}",
             (255, 255, 255),
-            font=AutourOne-Regular.ttf,
+            font=ImageFont.truetype("AdnanXMusic/assets/AutourOne-Regular.ttf", 30),
         )
         try:
             os.remove(f"cache/thumb{videoid}.png")
