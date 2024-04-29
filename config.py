@@ -13,6 +13,15 @@ API_HASH = getenv("API_HASH")
 # Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
+# This API Key For Userinfo checker.
+
+API_ID = 'API_ID' 
+# Replace 'your_api_id' with your actual Telegram API ID.
+API_HASH = 'API_HASH'  
+# Replace 'your_api_hash' with your actual Telegram API HASH.
+BOT_TOKEN = 'BOT_TOKEN'  
+# Replace 'your_bot_token' with your actual Telegram BOT token.
+
 # Get your mongo url from cloud.mongodb.com
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
