@@ -8,12 +8,3 @@ cache/
 downloads/
 __pycache__/
 *.session-journal
-*.pyc
-*.pyo
-__pycache__/
-.env
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-venv/
