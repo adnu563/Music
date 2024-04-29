@@ -9,7 +9,7 @@
     "AdnanX",
     "MusicBot",
     "telegram-bot",
-    "pyrogram".
+    "pyrogram"
     ],
     "env": {
       "API_ID": {
