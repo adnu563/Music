@@ -9,7 +9,9 @@
     "AdnanX",
     "MusicBot",
     "telegram-bot",
-    "pyrogram"
+    "pyrogram".
+    "telethon",
+    "python",
     ],
     "env": {
       "API_ID": {
@@ -58,6 +60,7 @@
         "required": true
       }
     },
+     "addons": [],
     "buildpacks": [
           {
               "url": "heroku/python"
