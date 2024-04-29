@@ -1,6 +1,7 @@
 import logging
 from telethon import TelegramClient, events
 import config
+from AdnanXMusic import app
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
