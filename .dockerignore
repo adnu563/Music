@@ -8,3 +8,17 @@ cache/
 downloads/
 __pycache__/
 *.session-journal
+
+# Ignore common Python files and directories
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment directories
+venv/
+env/
+*.env
+
+# Ignore project-specific files or directories
+config.py  # Assuming this contains sensitive information like API keys
