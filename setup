@@ -1,5 +1,13 @@
 #!/bin/bash
 
+python -m venv venv
+
+# Activate the virtual environment
+source venv/bin/activate
+
+# Install required dependencies
+pip install -r requirements.txt
+
 pprint (){
 	cred='\033[0;31m'
 	cgreen='\033[0;32m'
