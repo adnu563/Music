@@ -13,12 +13,6 @@ API_HASH = getenv("API_HASH")
 # Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
-API_ID = '27913018'
-API_HASH = '04e2f4e414cdabe52ad985adaa6cfe09'
-
-# Get your token from @BotFather on Telegram.
-BOT_TOKEN = '6613472799:AAFeDrOP1k_Ipie5KOUAn_Kj5tN7ZshriWw'
-
 # Get your mongo url from cloud.mongodb.com
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
@@ -42,7 +36,7 @@ UPSTREAM_REPO = getenv(
 )
 UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
 GIT_TOKEN = getenv(
-    "https://Adnan69x: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@github.com/Adnan69x/AdnanXMusic", None
+    "GIT_TOKEN", None
 )  # Fill this variable if your upstream repository is private
 
 SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/MusicGhor")
