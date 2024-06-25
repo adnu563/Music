@@ -1,8 +1,6 @@
 import asyncio
 import importlib
-
 from pyrogram import idle
-
 import config
 from AdnanXMusic import LOGGER, app, userbot
 from AdnanXMusic.core.call import Adnany
@@ -11,8 +9,8 @@ from AdnanXMusic.plugins import ALL_MODULES
 from AdnanXMusic.utils.database import get_banned_users, get_gbanned
 from config import BANNED_USERS
 
-# Handle ImportError for NoActiveGroupCall
 try:
+    from pytgcalls import PyTgCalls, StreamType
     from pytgcalls.exceptions import NoActiveGroupCall
 except ImportError:
     class NoActiveGroupCall(Exception):
