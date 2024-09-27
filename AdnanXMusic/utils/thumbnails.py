@@ -7,7 +7,7 @@ from urllib.parse import urlparse, parse_qs
 from youtubesearchpython.__future__ import VideosSearch
 from unidecode import unidecode
 
-from AdnanXMusic import app  # Ensure this module is accessible
+from AdnanXMusic import app  # Make sure this module is accessible
 from config import YOUTUBE_IMG_URL
 
 
@@ -42,33 +42,45 @@ def extract_video_id(youtube_url):
 async def get_thumb(videoid):
     """Fetches the YouTube thumbnail, modifies it, and returns the path to the saved image."""
     # Check if the thumbnail already exists in the cache
-    cache_path = f"cache/{videoid}.png"
-    if os.path.isfile(cache_path):
-        return cache_path
+    if os.path.isfile(f"cache/{videoid}.png"):
+        return f"cache/{videoid}.png"
 
     url = f"https://www.youtube.com/watch?v={videoid}"
     try:
         # Fetch YouTube video details using the search API
         results = VideosSearch(url, limit=1)
-        result = (await results.next())["result"][0]
-        
-        # Extract information from the result
-        title = re.sub("\W+", " ", result.get("title", "Unsupported Title")).title()
-        duration = result.get("duration", "Unknown Mins")
-        thumbnail_url = result["thumbnails"][0]["url"].split("?")[0]
-        views = result.get("viewCount", {}).get("short", "Unknown Views")
-        channel = result.get("channel", {}).get("name", "Unknown Channel")
+        for result in (await results.next())["result"]:
+            try:
+                title = re.sub("\W+", " ", result.get("title", "Unsupported Title")).title()
+            except:
+                title = "Unsupported Title"
+
+            try:
+                duration = result.get("duration", "Unknown Mins")
+            except:
+                duration = "Unknown Mins"
+
+            thumbnail_url = result["thumbnails"][0]["url"].split("?")[0]
+
+            try:
+                views = result.get("viewCount", {}).get("short", "Unknown Views")
+            except:
+                views = "Unknown Views"
+
+            try:
+                channel = result.get("channel", {}).get("name", "Unknown Channel")
+            except:
+                channel = "Unknown Channel"
 
         # Download thumbnail image
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail_url) as resp:
                 if resp.status == 200:
-                    temp_thumb_path = f"cache/temp_thumb_{videoid}.png"
-                    async with aiofiles.open(temp_thumb_path, "wb") as f:
+                    async with aiofiles.open(f"cache/temp_thumb_{videoid}.png", "wb") as f:
                         await f.write(await resp.read())
 
         # Open and process the image
-        youtube_img = Image.open(temp_thumb_path)
+        youtube_img = Image.open(f"cache/temp_thumb_{videoid}.png")
         resized_image = change_image_size(1280, 720, youtube_img).convert("RGBA")
 
         # Create a blurred background
@@ -80,58 +92,61 @@ async def get_thumb(videoid):
 
         # Use fonts from the assets directory
         arial_font = ImageFont.truetype("AdnanXMusic/assets/AutourOne-Regular.ttf", 35)
-        regular_font = ImageFont.truetype("AdnanXMusic/assets/AutourOne-Regular.ttf", 20)
+        regular_font = ImageFont.truetype("AdnanXMusic/assets/AutourOne-Regular.ttf", 25)
         main_font = ImageFont.truetype("AdnanXMusic/assets/font.ttf", 28)
 
         # Draw the app name at the top-left corner
-        draw.text((22, 14), unidecode(app.name), fill="white", font=arial_font)
+        draw.text((22, 14), unidecode(app.name), fill="white", font=arial_font)  # Position on the left side
 
         # Draw the YouTube title centered above the duration
         title_text = clean_title(title)
         title_bbox = draw.textbbox((0, 0), title_text, font=main_font)
+        title_width = title_bbox[2] - title_bbox[0]
         draw.text(
-            ((background.width - (title_bbox[2] - title_bbox[0])) / 2, 430),  # Centered above duration
+            ((background.width - title_width) / 2, 430),  # Centered above the duration
             title_text,
-            fill="white",
+            fill=(255, 255, 255),
             font=main_font
         )
 
         # Draw the duration overlay
-        draw.text((70, 475), "00:00", fill="white", font=arial_font)  # Start duration
-        draw.text((1122, 475), duration, fill="white", font=arial_font)  # End duration
+        draw.text((70, 475), "00:00", fill=(255, 255, 255), font=arial_font)  # Start duration
+        draw.text((1122, 475), duration, fill=(255, 255, 255), font=arial_font)  # End duration
 
-        # Create and position channel info and views
+        # Draw channel and views, centered between 50-pixel margins from both sides
         channel_info = f"{channel} | {views}"
+        channel_bbox = draw.textbbox((0, 0), channel_info, font=regular_font)
+        channel_width = channel_bbox[2] - channel_bbox[0]
 
-        # Calculate the bounding box for the channel name and views
-        channel_bbox = draw.textbbox((0, 0), channel, font=regular_font)
-        views_bbox = draw.textbbox((0, 0), views, font=regular_font)
-        pipe_symbol = "|"
+        # Set the margin of 50 pixels from left and right, so the text is centered within the remaining width
+        left_margin = 50
+        right_margin = background.width - 50
 
-        # Calculate total width of the channel name, pipe symbol, and views
-        total_text_width = (channel_bbox[2] - channel_bbox[0]) + 2 + (views_bbox[2] - views_bbox[0])  # 2px space for pipe
+        # Calculate the starting position to center the text between the margins
+        x_position = (right_margin - left_margin - channel_width) / 2 + left_margin
 
-        # Calculate the central position for the pipe symbol and adjust the text positions
-        pipe_x = (background.width - total_text_width) // 2
-        channel_x = pipe_x - 50 - (channel_bbox[2] - channel_bbox[0])  # Move channel 50px to the left
-        views_x = pipe_x + 2 + (views_bbox[2] - views_bbox[0]) + 50  # Move views 50px to the right
+        # Move 10px to the left
+        x_position -= 30
 
-        # Draw the channel name, pipe symbol, and views on the image
-        draw.text((channel_x, 450), channel, fill="white", font=arial_font)  # Channel text
-        draw.text((pipe_x, 650), pipe_symbol, fill="white", font=arial_font)  # Pipe symbol "|"
-        draw.text((views_x, 450), views, fill="white", font=arial_font)  # Views text
+        # Draw the text at the new position
+        draw.text(
+            (x_position, 650),  # Position near the bottom, keeping it centered between the margins
+            channel_info,
+            fill=(255, 255, 255),
+            font=arial_font
+        )
 
         # Overlay image just below the YouTube title
         overlay_img = Image.open("AdnanXMusic/assets/overly.png")
-        overlay_img = overlay_img.resize((890, 280))
-        overlay_position = ((background.width - overlay_img.width) // 2, 400)
+        overlay_img = overlay_img.resize((890, 280))  # Resize overlay if necessary
+        overlay_position = ((background.width - overlay_img.width) // 2, 400)  # Position below title
         background.paste(overlay_img, overlay_position, overlay_img)
 
         # Clean up and save the final image
-        os.remove(temp_thumb_path)
-        background.save(cache_path)
-        return cache_path
+        os.remove(f"cache/temp_thumb_{videoid}.png")
+        background.save(f"cache/{videoid}.png")
+        return f"cache/{videoid}.png"
 
     except Exception as e:
-        print(f"Error occurred while processing video: {e}")
+        print(e)
         return YOUTUBE_IMG_URL
