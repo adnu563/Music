@@ -5,7 +5,7 @@ import yt_dlp
 from pyrogram import filters
 from pyrogram.types import Message
 from youtube_search import YoutubeSearch
-from PIL import Image  # Import to resize the thumbnail
+from PIL import Image  # For resizing the video thumbnail
 from AdnanXMusic import app
 
 # Create a downloads directory if it doesn't exist
@@ -35,22 +35,27 @@ def shorten_views(views):
 def resize_thumbnail(input_path, output_path):
     """Resize the thumbnail to 1280x720 and save it."""
     with Image.open(input_path) as img:
-        img = img.resize((1280, 720))
-        img.save(output_path)
+        img = img.resize((1280, 720))  # Resizing to 1280x720 resolution
+        img.save(output_path, "JPEG", quality=85)  # Saving as JPEG with 85% quality to reduce file size
 
-@app.on_message(filters.command(["video", "yt"]))
-async def video(_, message: Message):
+@app.on_message(filters.command(["song", "music", "video", "yt"], prefixes=["/", "!", ".", ",", "#", "|"]))
+async def download_media(_, message: Message):
     try:
         await message.delete()  # Delete the command message
     except Exception:
         pass  # Silent fail if the message cannot be deleted
 
-    m = await message.reply_text("🔎")
-
     query = " ".join(message.command[1:])
+    media_type = message.command[0].lower()
+
+    # Respond based on the command type
+    if media_type in ["song", "music"]:
+        m = await message.reply_text("Downloading the song, Please Wait...")
+    elif media_type in ["video", "yt"]:
+        m = await message.reply_text("Downloading the video, please wait...")
 
     try:
-        # Search for the video on YouTube
+        # Search for the media on YouTube
         results = YoutubeSearch(query, max_results=5).to_dict()
         link = f"https://youtube.com{results[0]['url_suffix']}"
         title = results[0]["title"][:40]
@@ -61,43 +66,62 @@ async def video(_, message: Message):
         with open(thumb_name, "wb") as thumb_file:
             thumb_file.write(thumb.content)
 
-        # Resize the thumbnail to 1280x720
-        resized_thumb_name = f"downloads/thumb_{sanitized_title}_resized.jpg"
-        resize_thumbnail(thumb_name, resized_thumb_name)
+        # Resize the thumbnail for video to 1280x720 if video
+        if media_type in ["video", "yt"]:
+            resized_thumb_name = f"downloads/thumb_{sanitized_title}_resized.jpg"
+            resize_thumbnail(thumb_name, resized_thumb_name)
 
         duration = results[0]["duration"]
         duration_formatted = shorten_views(duration)
         singer = results[0]["channel"]
 
-        # Fetch total views using yt_dlp with cookies, ensuring only mp4 format is used
-        ydl_opts = {
-            "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4",  # Force mp4 format
-            "cookiefile": "AdnanXMusic/assets/cookies.txt",
-            "quiet": True,
-            "outtmpl": f"downloads/{sanitized_title}.%(ext)s",  # Ensure file extension is included
-        }
+        if media_type in ["song", "music"]:
+            # Song download options
+            ydl_opts = {
+                "format": "bestaudio/best",
+                "cookiefile": "AdnanXMusic/assets/cookies.txt",
+                "quiet": True,
+                "outtmpl": f"downloads/{sanitized_title}",  # Use sanitized title for download path
+                "postprocessors": [{
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "320",  # Ensure highest quality audio (320kbps)
+                }],
+            }
+
+        elif media_type in ["video", "yt"]:
+            # Video download options
+            ydl_opts = {
+                "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4",  # Force mp4 format
+                "cookiefile": "AdnanXMusic/assets/cookies.txt",
+                "quiet": True,
+                "outtmpl": f"downloads/{sanitized_title}.%(ext)s",  # Ensure file extension is included
+            }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=True)  # Force download, not just extract info
             total_views = info_dict.get("view_count", "N/A")
             total_views_short = shorten_views(total_views)
 
-            # Get the actual downloaded file name and ensure .mp4 is used
-            downloaded_file = ydl.prepare_filename(info_dict)
-            downloaded_file = downloaded_file.replace(".webm", ".mp4")  # Remove .webm extension if exists
-            print(f"Downloaded file path: {downloaded_file}")
+            if media_type in ["song", "music"]:
+                # Get the actual downloaded file name for song
+                downloaded_file = f"{(ydl.prepare_filename(info_dict))}.mp3"
+                print(f"Downloaded song path: {downloaded_file}")
+            elif media_type in ["video", "yt"]:
+                # Get the actual downloaded file name and ensure .mp4 is used
+                downloaded_file = ydl.prepare_filename(info_dict)
+                downloaded_file = downloaded_file.replace(".webm", ".mp4")  # Remove .webm extension if exists
+                print(f"Downloaded video path: {downloaded_file}")
 
     except Exception as ex:
         return await m.edit_text(
-            f"<b>Failed to fetch or download the video from YouTube.\n● Reason:</b> `{ex}`"
+            f"<b>Failed to fetch or download the {media_type} from YouTube.\n● Reason:</b> `{ex}`"
         )
 
-    await m.edit_text("⏳ Downloading the video, please wait...")
-
     try:
-        # Ensure the video file exists before sending it
+        # Ensure the media file exists before sending it
         if not os.path.exists(downloaded_file):
-            raise FileNotFoundError(f"Video file not found: {downloaded_file}")
+            raise FileNotFoundError(f"{media_type.capitalize()} file not found: {downloaded_file}")
 
         bot_username = _.me.username
         rep = (
@@ -113,22 +137,42 @@ async def video(_, message: Message):
             dur += int(dur_arr[i]) * secmul
             secmul *= 60
 
-        # Send the video file to Telegram chat with resized thumbnail
-        await app.send_video(
-            chat_id=message.chat.id,
-            video=downloaded_file,  # Use the correct video file
-            caption=rep,
-            thumb=resized_thumb_name,  # Use the resized thumbnail
-            duration=dur,
-        )
-        await m.delete()  # Delete the "downloading" message
-    except Exception as e:
-        return await m.edit_text(f"Failed to send video. Error: {e}")
+        if media_type in ["song", "music"]:
+            # Send the audio file to Telegram chat
+            await app.send_audio(
+                chat_id=message.chat.id,
+                audio=downloaded_file,  # Use the correct MP3 file
+                caption=rep,
+                thumb=thumb_name,
+                title=title,
+                duration=dur,
+            )
 
-    # Cleanup the downloaded files
-    try:
-        os.remove(downloaded_file)  # Ensure the video file is removed
-        os.remove(thumb_name)  # Ensure the original thumbnail is removed
-        os.remove(resized_thumb_name)  # Ensure the resized thumbnail is removed
-    except Exception:
-        pass  # Silent fail for file cleanup
+        elif media_type in ["video", "yt"]:
+            # Send the video file to Telegram chat with resized thumbnail
+            await app.send_video(
+                chat_id=message.chat.id,
+                video=downloaded_file,  # Use the correct video file
+                caption=rep,
+                thumb=resized_thumb_name,  # Use the resized 1280x720 thumbnail
+                duration=dur,
+            )
+
+        await m.delete()  # Delete the "downloading" message
+        
+        # After successful upload, remove the video and thumbnails
+        if os.path.exists(downloaded_file):
+            os.remove(downloaded_file)
+        if media_type in ["video", "yt"]:
+            if os.path.exists(resized_thumb_name):
+                os.remove(resized_thumb_name)
+        if os.path.exists(thumb_name):
+            os.remove(thumb_name)
+
+    except Exception as e:
+        # Handle message editing error
+        try:
+            return await m.edit_text(f"Failed to send {media_type}. Error: {e}")
+        except pyrogram.errors.exceptions.bad_request_400.MessageIdInvalid:
+            # The message might be already deleted or invalid, so just pass silently
+            pass
