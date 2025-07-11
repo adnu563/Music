@@ -177,10 +177,7 @@ class YouTubeAPI:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-        ytdl_opts = {
-    "quiet": True,
-    "cookiefile": "AdnanXMusic/assetes/cookies.txt",
-                    }
+        ytdl_opts = {"quiet": True}
         ydl = yt_dlp.YoutubeDL(ytdl_opts)
         with ydl:
             formats_available = []
@@ -252,7 +249,6 @@ class YouTubeAPI:
                 "nocheckcertificate": True,
                 "quiet": True,
                 "no_warnings": True,
-                "cookiefile": "AdnanXMusic/assetes/cookies.txt",
             }
             x = yt_dlp.YoutubeDL(ydl_optssx)
             info = x.extract_info(link, False)
@@ -270,7 +266,6 @@ class YouTubeAPI:
                 "nocheckcertificate": True,
                 "quiet": True,
                 "no_warnings": True,
-                "cookiefile": "AdnanXMusic/assetes/cookies.txt",
             }
             x = yt_dlp.YoutubeDL(ydl_optssx)
             info = x.extract_info(link, False)
@@ -290,7 +285,6 @@ class YouTubeAPI:
                 "nocheckcertificate": True,
                 "quiet": True,
                 "no_warnings": True,
-                "cookiefile": "AdnanXMusic/assetes/cookies.txt",
                 "prefer_ffmpeg": True,
                 "merge_output_format": "mp4",
             }
@@ -306,7 +300,6 @@ class YouTubeAPI:
                 "nocheckcertificate": True,
                 "quiet": True,
                 "no_warnings": True,
-                "cookiefile": "AdnanXMusic/assetes/cookies.txt",
                 "prefer_ffmpeg": True,
                 "postprocessors": [
                     {
