@@ -1,331 +1,145 @@
-import asyncio
-import os
-import logging
-import re
-from typing import Union
-import yt_dlp
-from pyrogram.enums import MessageEntityType
-from pyrogram.types import Message
-from youtubesearchpython.__future__ import VideosSearch
-from AdnanXMusic.utils.database import is_on_off
-from AdnanXMusic.utils.formatters import time_to_seconds
+import random
+import string
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardMarkup, InputMediaPhoto, Message
+from pytgcalls.exceptions import NoActiveGroupCall
 
-async def shell_cmd(cmd):
-    proc = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
+import config
+from AdnanXMusic import Apple, Resso, SoundCloud, Spotify, Telegram, YouTube, app
+from AdnanXMusic.core.call import Adnany
+from AdnanXMusic.utils import seconds_to_min, time_to_seconds
+from AdnanXMusic.utils.channelplay import get_channeplayCB
+from AdnanXMusic.utils.decorators.language import languageCB
+from AdnanXMusic.utils.decorators.play import PlayWrapper
+from AdnanXMusic.utils.formatters import formats
+from AdnanXMusic.utils.inline import (
+    botplaylist_markup,
+    livestream_markup,
+    playlist_markup,
+    slider_markup,
+    track_markup,
+)
+from AdnanXMusic.utils.logger import play_logs
+from AdnanXMusic.utils.stream.stream import stream
+from config import BANNED_USERS, lyrical
+
+
+@app.on_message(
+    filters.command([
+        "play", "vplay", "cplay", "cvplay",
+        "playforce", "vplayforce", "cplayforce", "cvplayforce"
+    ])
+    & filters.group
+    & ~BANNED_USERS
+)
+@PlayWrapper
+async def play_commnd(
+    client,
+    message: Message,
+    _,
+    chat_id,
+    video,
+    channel,
+    playmode,
+    url,
+    fplay,
+):
+    mystic = await message.reply_text(
+        _["play_2"].format(channel) if channel else _["play_1"]
     )
-    out, errorz = await proc.communicate()
-    if errorz:
-        error_message = errorz.decode("utf-8")
-        logging.error(f"Error executing shell command: {error_message}")
-        if "unavailable videos are hidden" in error_message.lower():
-            return out.decode("utf-8")
-        else:
-            return error_message
-    return out.decode("utf-8")
 
+    plist_id = None
+    plist_type = None
+    spotify = None
+    img = None
+    cap = None
 
-class YouTubeAPI:
-    def __init__(self):
-        self.base = "https://www.youtube.com/watch?v="
-        self.regex = r"(?:youtube\.com|youtu\.be)"
-        self.status = "https://www.youtube.com/oembed?url="
-        self.listbase = "https://youtube.com/playlist?list="
+    if len(message.command) < 2:
+        buttons = botplaylist_markup(_)
+        return await mystic.edit_text(
+            _["play_18"],
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
 
-    async def exists(self, link: str, videoid: Union[bool, str] = None):
+    query = message.text.split(None, 1)[1]
+    if "-v" in query:
+        query = query.replace("-v", "")
+
+    try:
+        details, track_id = await YouTube.track(query)
+        if not details:
+            return await mystic.edit_text(_["play_3"])
+    except Exception as e:
+        return await mystic.edit_text(f"{_['play_3']}\n\n{type(e).__name__}: {e}")
+
+    streamtype = "youtube"
+    duration_min = details.get("duration_min")
+
+    if str(playmode) == "Direct":
+        if not plist_type:
+            if not duration_min:
+                buttons = livestream_markup(
+                    _,
+                    track_id,
+                    message.from_user.id,
+                    "v" if video else "a",
+                    "c" if channel else "g",
+                    "f" if fplay else "d",
+                )
+                return await mystic.edit_text(
+                    _["play_13"],
+                    reply_markup=InlineKeyboardMarkup(buttons),
+                )
+            duration_sec = time_to_seconds(duration_min)
+            if duration_sec > config.DURATION_LIMIT:
+                return await mystic.edit_text(
+                    _["play_6"].format(config.DURATION_LIMIT_MIN, app.mention)
+                )
+
         try:
-            if videoid:
-                link = self.base + link
-            return bool(re.search(self.regex, link))
-        except Exception as e:
-            logging.error(f"Error in checking if URL exists: {str(e)}")
-            return False
-
-    async def url(self, message_1: Message) -> Union[str, None]:
-        try:
-            messages = [message_1]
-            if message_1.reply_to_message:
-                messages.append(message_1.reply_to_message)
-            text = ""
-            offset = None
-            length = None
-            for message in messages:
-                if offset:
-                    break
-                if message.entities:
-                    for entity in message.entities:
-                        if entity.type == MessageEntityType.URL:
-                            text = message.text or message.caption
-                            offset, length = entity.offset, entity.length
-                            break
-                elif message.caption_entities:
-                    for entity in message.caption_entities:
-                        if entity.type == MessageEntityType.TEXT_LINK:
-                            return entity.url
-            if offset is None:
-                return None
-            return text[offset : offset + length]
-        except Exception as e:
-            logging.error(f"Error extracting URL from message: {str(e)}")
-            return None
-
-    async def details(self, link: str, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]  # Corrected the syntax here
-            results = VideosSearch(link, limit=1)
-            for result in (await results.next())["result"]:
-                title = result["title"]
-                duration_min = result["duration"]
-                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-                vidid = result["id"]
-                duration_sec = int(time_to_seconds(duration_min)) if duration_min != "None" else 0
-            return title, duration_min, duration_sec, thumbnail, vidid
-        except Exception as e:
-            logging.error(f"Error getting video details: {str(e)}")
-            return None, None, None, None, None
-
-    async def title(self, link: str, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]  # Corrected the syntax here
-            results = VideosSearch(link, limit=1)
-            for result in (await results.next())["result"]:
-                title = result["title"]
-            return title
-        except Exception as e:
-            logging.error(f"Error getting video title: {str(e)}")
-            return None
-
-    async def duration(self, link: str, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]  # Corrected the syntax here
-            results = VideosSearch(link, limit=1)
-            for result in (await results.next())["result"]:
-                duration = result["duration"]
-            return duration
-        except Exception as e:
-            logging.error(f"Error getting video duration: {str(e)}")
-            return None
-
-    async def thumbnail(self, link: str, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]  # Corrected the syntax here
-            results = VideosSearch(link, limit=1)
-            for result in (await results.next())["result"]:
-                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-            return thumbnail
-        except Exception as e:
-            logging.error(f"Error getting video thumbnail: {str(e)}")
-            return None
-
-    async def video(self, link: str, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]
-
-            logging.info(f"Preparing video download for: {link}")
-
-            ydl_opts = {
-                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best',
-                'outtmpl': 'downloads/%(id)s.%(ext)s',
-                'quiet': True,
-                'merge_output_format': 'mp4',
-                'cookiefile': 'AdnanXMusic/assets/cookies.txt',
-                'writethumbnail': True,  # Include thumbnail
-                'postprocessors': [
-                    {'key': 'EmbedThumbnail'},
-                    {'key': 'FFmpegMetadata'},
-                ],
-            }
-
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                try:
-                    info = ydl.extract_info(link, download=True)
-                    file_path = ydl.prepare_filename(info)
-                    logging.info(f"Downloaded successfully: {file_path}")
-                    return 1, file_path
-                except yt_dlp.DownloadError as e:
-                    logging.error(f"Download failed: {e}")
-                    return 0, str(e)
-        except Exception as e:
-            logging.error(f"Error in video download: {str(e)}")
-            return 0, str(e)
-
-    async def playlist(self, link, limit, user_id, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.listbase + link
-            if "&" in link:
-                link = link.split("&")[0]
-            playlist = await shell_cmd(
-                f"yt-dlp -i --get-id --flat-playlist --playlist-end {limit} --skip-download {link} --cookies AdnanXMusic/assets/cookies.txt"
+            await stream(
+                _,
+                mystic,
+                message.from_user.id,
+                details,
+                chat_id,
+                message.from_user.first_name,
+                message.chat.id,
+                video=video,
+                streamtype=streamtype,
+                spotify=spotify,
+                forceplay=fplay,
             )
-            result = playlist.split("\n")
-            result = [key for key in result if key != ""]
-            return result
         except Exception as e:
-            logging.error(f"Error in playlist processing: {str(e)}")
-            return []
+            ex_type = type(e).__name__
+            err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
+            return await mystic.edit_text(err)
 
-    async def track(self, link: str, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]
-            results = VideosSearch(link, limit=1)
-            for result in (await results.next())["result"]:
-                title = result["title"]
-                duration_min = result["duration"]
-                vidid = result["id"]
-                yturl = result["link"]
-                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-            track_details = {
-                "title": title,
-                "link": yturl,
-                "vidid": vidid,
-                "duration_min": duration_min,
-                "thumb": thumbnail,
-            }
-            return track_details, vidid
-        except Exception as e:
-            logging.error(f"Error fetching track details: {str(e)}")
-            return None, None
+        await mystic.delete()
+        return await play_logs(message, streamtype=streamtype)
 
-    async def formats(self, link: str, videoid: Union[bool, str] = None):
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]
-            ytdl_opts = {
-                "quiet": True,
-                "cookiefile": "AdnanXMusic/assets/cookies.txt"
-            }
-            ydl = yt_dlp.YoutubeDL(ytdl_opts)
-            with ydl:
-                formats_available = []
-                r = ydl.extract_info(link, download=False)
-                for format in r["formats"]:
-                    try:
-                        str(format["format"])
-                    except:
-                        continue
-                    if not "dash" in str(format["format"]).lower():
-                        try:
-                            format["format"]
-                            format["filesize"]
-                            format["format_id"]
-                            format["ext"]
-                            format["format_note"]
-                        except:
-                            continue
-                        formats_available.append(
-                            {
-                                "format": format["format"],
-                                "filesize": format["filesize"],
-                                "format_id": format["format_id"],
-                                "ext": format["ext"],
-                                "format_note": format["format_note"],
-                                "yturl": link,
-                            }
-                        )
-            return formats_available, link
-        except Exception as e:
-            logging.error(f"Error fetching formats: {str(e)}")
-            return [], link
-
-    async def download(
-        self,
-        link: str,
-        mystic,
-        video: Union[bool, str] = None,
-        videoid: Union[bool, str] = None,
-        songaudio: Union[bool, str] = None,
-        songvideo: Union[bool, str] = None,
-        format_id: Union[bool, str] = None,
-        title: Union[bool, str] = None,
-    ) -> str:
-        try:
-            if videoid:
-                link = self.base + link
-            if "&" in link:
-                link = link.split("&")[0]
-
-            loop = asyncio.get_running_loop()
-
-            def download_media():
-                ext = 'mp4'
-
-                # Define specific quality format for 720p explicitly
-                if songaudio:
-                    format_selection = 'bestaudio[ext=m4a]/bestaudio'
-                    ext = 'm4a'
-                elif songvideo:
-                    format_selection = 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best[height=720]'
-                elif format_id:
-                    format_selection = f"{format_id}+bestaudio"
-                else:
-                    # Default to best available if no specific condition provided
-                    format_selection = 'bestvideo[height=720][ext=mp4]+bestaudio[ext=m4a]/best'
-
-                output_template = f'downloads/{title if title else "%(id)s"}.{ext}'
-
-                ydl_opts = {
-                    "format": format_selection,
-                    "outtmpl": output_template,
-                    "quiet": True,
-                    "merge_output_format": ext,
-                    "writethumbnail": True,
-                    "cookiefile": "AdnanXMusic/assets/cookies.txt",
-                    "postprocessors": [
-                        {"key": "EmbedThumbnail"},
-                        {"key": "FFmpegMetadata"},
-                    ],
-                }
-
-                if songaudio:
-                    ydl_opts["postprocessors"].append(
-                        {
-                            "key": "FFmpegExtractAudio",
-                            "preferredcodec": "mp3",
-                            "preferredquality": "192",
-                        }
-                    )
-                    ext = 'mp3'
-
-                try:
-                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        info = ydl.extract_info(link, download=True)
-                        downloaded_file = ydl.prepare_filename(info)
-                        if songaudio:
-                            downloaded_file = downloaded_file.rsplit('.', 1)[0] + '.mp3'
-                        logging.info(f"Media downloaded successfully: {downloaded_file}")
-                        return downloaded_file, True
-                except Exception as e:
-                    logging.error(f"Media download failed: {str(e)}")
-                    return None, False
-
-            downloaded_file, success = await loop.run_in_executor(None, download_media)
-            return downloaded_file, success
-        except Exception as e:
-            logging.error(f"Error during download process: {str(e)}")
-            return None, False
+    else:
+        ran_hash = "".join(
+            random.choices(string.ascii_uppercase + string.digits, k=10)
+        )
+        lyrical[ran_hash] = plist_id or ""
+        buttons = slider_markup(
+            _,
+            track_id,
+            message.from_user.id,
+            query,
+            0,
+            "c" if channel else "g",
+            "f" if fplay else "d",
+        )
+        await mystic.delete()
+        await message.reply_photo(
+            photo=details["thumb"],
+            caption=_["play_10"].format(
+                details["title"].title(),
+                details["duration_min"],
+            ),
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+        return await play_logs(message, streamtype="Searched on Youtube")
