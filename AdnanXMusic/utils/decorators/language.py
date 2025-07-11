@@ -2,6 +2,7 @@ from strings import get_string
 
 from AdnanXMusic import app
 from AdnanXMusic.misc import SUDOERS
+from config import SUPPORT_CHAT
 from AdnanXMusic.utils.database import get_lang, is_maintenance
 
 
